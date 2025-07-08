@@ -52,6 +52,33 @@ export type Database = {
           },
         ]
       }
+      mpesa_callback_errors: {
+        Row: {
+          callback_payload: Json
+          created_at: string
+          error_details: Json | null
+          error_message: string
+          id: string
+          ip_address: unknown | null
+        }
+        Insert: {
+          callback_payload: Json
+          created_at?: string
+          error_details?: Json | null
+          error_message: string
+          id?: string
+          ip_address?: unknown | null
+        }
+        Update: {
+          callback_payload?: Json
+          created_at?: string
+          error_details?: Json | null
+          error_message?: string
+          id?: string
+          ip_address?: unknown | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_kes: number
@@ -61,6 +88,8 @@ export type Database = {
           merchant_request_id: string | null
           method: Database["public"]["Enums"]["payment_method"]
           mpesa_code: string | null
+          mpesa_receipt_number: string | null
+          paid_at: string | null
           phone_number: string | null
           status: Database["public"]["Enums"]["payment_status"]
           updated_at: string
@@ -74,6 +103,8 @@ export type Database = {
           merchant_request_id?: string | null
           method?: Database["public"]["Enums"]["payment_method"]
           mpesa_code?: string | null
+          mpesa_receipt_number?: string | null
+          paid_at?: string | null
           phone_number?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string
@@ -87,6 +118,8 @@ export type Database = {
           merchant_request_id?: string | null
           method?: Database["public"]["Enums"]["payment_method"]
           mpesa_code?: string | null
+          mpesa_receipt_number?: string | null
+          paid_at?: string | null
           phone_number?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string
