@@ -1,5 +1,5 @@
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -7,277 +7,237 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Initialize Supabase client
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-)
-
-// Safaricom sandbox IP addresses for validation (optional)
-const SAFARICOM_IPS = [
-  '196.201.214.200',
-  '196.201.214.206',
-  '196.201.213.114',
-  '196.201.214.207',
-  '196.201.214.208',
-  '196.201.213.44',
-  '196.201.212.127',
-  '196.201.212.138',
-  '196.201.212.129',
-  '196.201.212.136'
-]
-
-interface CallbackMetadata {
-  Item: Array<{
-    Name: string
-    Value: string | number
-  }>
-}
-
-interface STKCallback {
-  MerchantRequestID: string
-  CheckoutRequestID: string
-  ResultCode: number
-  ResultDesc: string
-  CallbackMetadata?: CallbackMetadata
-}
-
-interface CallbackPayload {
+interface MPESACallbackBody {
   Body: {
-    stkCallback: STKCallback
-  }
-}
-
-// Helper function to extract metadata value
-function getMetadataValue(metadata: CallbackMetadata, name: string): string | number | null {
-  const item = metadata.Item.find(item => item.Name === name)
-  return item ? item.Value : null
-}
-
-// Helper function to log callback errors
-async function logCallbackError(
-  payload: any,
-  errorMessage: string,
-  errorDetails: any = null,
-  ipAddress: string | null = null
-) {
-  try {
-    await supabase
-      .from('mpesa_callback_errors')
-      .insert({
-        callback_payload: payload,
-        error_message: errorMessage,
-        error_details: errorDetails,
-        ip_address: ipAddress
-      })
-  } catch (error) {
-    console.error('Failed to log callback error:', error)
-  }
-}
-
-// Helper function to log activity
-async function logActivity(
-  userId: string,
-  action: string,
-  details: any,
-  ipAddress: string | null = null
-) {
-  try {
-    await supabase
-      .from('activity_logs')
-      .insert({
-        user_id: userId,
-        action,
-        details,
-        ip_address: ipAddress
-      })
-  } catch (error) {
-    console.error('Failed to log activity:', error)
-  }
+    stkCallback: {
+      MerchantRequestID: string;
+      CheckoutRequestID: string;
+      ResultCode: number;
+      ResultDesc: string;
+      CallbackMetadata?: {
+        Item: Array<{
+          Name: string;
+          Value: string | number;
+        }>;
+      };
+    };
+  };
 }
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    console.log('=== MPESA Callback Received ===')
-    
-    // Get client IP for validation and logging
-    const clientIP = req.headers.get('x-forwarded-for') || 
-                     req.headers.get('cf-connecting-ip') || 
-                     req.headers.get('x-real-ip') || 
-                     'unknown'
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    )
 
+    // Parse the callback data
+    const callbackData: MPESACallbackBody = await req.json()
+    const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown'
+    
+    console.log('MPESA Callback received:', JSON.stringify(callbackData, null, 2))
     console.log('Client IP:', clientIP)
 
-    // Optional: Validate Safaricom IP (uncomment for production)
-    // if (clientIP !== 'unknown' && !SAFARICOM_IPS.includes(clientIP)) {
-    //   console.log('Invalid IP address:', clientIP)
-    //   return new Response(
-    //     JSON.stringify({ error: 'Unauthorized IP address' }),
-    //     { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    //   )
-    // }
-
-    // Parse callback payload
-    const payload: CallbackPayload = await req.json()
-    console.log('Callback payload:', JSON.stringify(payload, null, 2))
-
-    // Extract callback data
+    const { stkCallback } = callbackData.Body
     const {
       MerchantRequestID,
       CheckoutRequestID,
       ResultCode,
       ResultDesc,
       CallbackMetadata
-    } = payload.Body.stkCallback
+    } = stkCallback
 
-    console.log('Processing callback for CheckoutRequestID:', CheckoutRequestID)
-    console.log('ResultCode:', ResultCode, 'ResultDesc:', ResultDesc)
-
-    // Find the payment record using CheckoutRequestID
-    const { data: payment, error: paymentError } = await supabase
+    // Find the original payment record
+    const { data: payment, error: paymentFetchError } = await supabaseClient
       .from('payments')
       .select('*')
       .eq('checkout_request_id', CheckoutRequestID)
       .single()
 
-    if (paymentError || !payment) {
-      const errorMsg = `Payment record not found for CheckoutRequestID: ${CheckoutRequestID}`
-      console.error(errorMsg)
+    if (paymentFetchError || !payment) {
+      console.error('Payment record not found:', paymentFetchError)
       
-      await logCallbackError(
-        payload,
-        errorMsg,
-        paymentError,
-        clientIP
-      )
+      // Log the error for debugging
+      await supabaseClient
+        .from('mpesa_callback_errors')
+        .insert([{
+          callback_payload: callbackData,
+          error_message: 'Payment record not found',
+          error_details: { checkout_request_id: CheckoutRequestID },
+          ip_address: clientIP
+        }])
 
       return new Response(
-        JSON.stringify({ status: 'OK', message: 'Payment record not found' }),
+        JSON.stringify({ ResultCode: 1, ResultDesc: "Payment record not found" }),
         { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          status: 200, // Return 200 to acknowledge receipt
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
 
-    console.log('Found payment record:', payment.id)
-
-    // Determine payment status based on ResultCode
-    let paymentStatus: 'success' | 'failed' | 'pending' = 'failed'
-    let mpesaReceiptNumber: string | null = null
-    let amount: number | null = null
-    let phoneNumber: string | null = null
-    let paidAt: string | null = null
-
-    if (ResultCode === 0) {
-      // Payment successful
-      paymentStatus = 'success'
-      paidAt = new Date().toISOString()
-
-      if (CallbackMetadata) {
-        // Extract metadata values
-        mpesaReceiptNumber = getMetadataValue(CallbackMetadata, 'MpesaReceiptNumber') as string
-        amount = getMetadataValue(CallbackMetadata, 'Amount') as number
-        phoneNumber = getMetadataValue(CallbackMetadata, 'PhoneNumber') as string
-
-        console.log('Payment successful - Receipt:', mpesaReceiptNumber, 'Amount:', amount)
-      }
-    } else {
-      // Payment failed
-      paymentStatus = 'failed'
-      console.log('Payment failed - Code:', ResultCode, 'Desc:', ResultDesc)
+    let updateData: any = {
+      updated_at: new Date().toISOString()
     }
 
-    // Update payment record
-    const { error: updateError } = await supabase
-      .from('payments')
-      .update({
-        status: paymentStatus,
+    // Parse callback metadata if payment was successful
+    let amount = 0
+    let mpesaReceiptNumber = null
+    let phoneNumber = null
+
+    if (ResultCode === 0 && CallbackMetadata?.Item) {
+      // Payment successful - extract metadata
+      for (const item of CallbackMetadata.Item) {
+        switch (item.Name) {
+          case 'Amount':
+            amount = Number(item.Value)
+            break
+          case 'MpesaReceiptNumber':
+            mpesaReceiptNumber = String(item.Value)
+            break
+          case 'PhoneNumber':
+            phoneNumber = String(item.Value)
+            break
+        }
+      }
+
+      updateData = {
+        ...updateData,
+        status: 'success',
         mpesa_receipt_number: mpesaReceiptNumber,
-        paid_at: paidAt,
-        updated_at: new Date().toISOString()
-      })
+        paid_at: new Date().toISOString()
+      }
+
+      console.log(`Payment successful: ${amount} from ${phoneNumber}, Receipt: ${mpesaReceiptNumber}`)
+    } else {
+      // Payment failed
+      updateData.status = 'failed'
+      console.log(`Payment failed: ${ResultDesc}`)
+    }
+
+    // Update the payment record
+    const { error: updateError } = await supabaseClient
+      .from('payments')
+      .update(updateData)
       .eq('id', payment.id)
 
     if (updateError) {
-      console.error('Failed to update payment record:', updateError)
-      
-      await logCallbackError(
-        payload,
-        'Failed to update payment record',
-        updateError,
-        clientIP
-      )
-
-      return new Response(
-        JSON.stringify({ status: 'OK', message: 'Failed to update payment' }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+      console.error('Error updating payment:', updateError)
+      throw updateError
     }
 
     // Log activity
-    const activityDetails = {
-      payment_id: payment.id,
-      merchant_request_id: MerchantRequestID,
-      checkout_request_id: CheckoutRequestID,
-      result_code: ResultCode,
-      result_desc: ResultDesc,
-      status: paymentStatus,
-      amount: amount,
-      phone_number: phoneNumber,
-      mpesa_receipt_number: mpesaReceiptNumber
+    await supabaseClient.rpc('log_activity', {
+      p_user_id: payment.user_id,
+      p_action: 'mpesa_payment_callback',
+      p_details: {
+        payment_id: payment.id,
+        status: updateData.status,
+        amount: amount || payment.amount_kes,
+        mpesa_receipt_number: mpesaReceiptNumber,
+        phone_number: phoneNumber || payment.phone_number,
+        result_code: ResultCode,
+        result_desc: ResultDesc
+      }
+    })
+
+    // If payment was successful, create subscription
+    if (ResultCode === 0) {
+      console.log('Payment successful, creating subscription...')
+      
+      // Extract plan ID from account reference
+      const accountRef = payment.checkout_request_id ? 
+        await supabaseClient
+          .from('payments')
+          .select('*')
+          .eq('checkout_request_id', CheckoutRequestID)
+          .single()
+          .then(({ data }) => data?.merchant_request_id || '') 
+        : ''
+
+      // Try to extract plan ID from the payment record or account reference
+      // For now, we'll need to find the plan based on the amount paid
+      const { data: matchingPlan, error: planError } = await supabaseClient
+        .from('plans')
+        .select('*')
+        .eq('price_kes', amount || payment.amount_kes)
+        .eq('is_active', true)
+        .limit(1)
+        .single()
+
+      if (planError || !matchingPlan) {
+        console.error('Could not find matching plan for amount:', amount || payment.amount_kes)
+      } else {
+        // Create subscription via the subscription manager
+        try {
+          const { data: subscriptionResponse, error: subError } = await supabaseClient.functions.invoke('subscription-manager', {
+            body: {
+              action: 'create_subscription',
+              user_id: payment.user_id,
+              plan_id: matchingPlan.id,
+              payment_id: payment.id
+            }
+          })
+
+          if (subError) {
+            console.error('Error creating subscription:', subError)
+          } else {
+            console.log('Subscription created successfully:', subscriptionResponse)
+          }
+        } catch (error) {
+          console.error('Error calling subscription manager:', error)
+        }
+      }
     }
 
-    await logActivity(
-      payment.user_id,
-      'MPESA Payment Callback',
-      activityDetails,
-      clientIP
-    )
+    console.log(`Payment callback processed successfully for CheckoutRequestID: ${CheckoutRequestID}`)
 
-    console.log('Payment callback processed successfully')
-
-    // Always return OK to Safaricom
+    // Return success response to Safaricom
     return new Response(
-      JSON.stringify({ status: 'OK' }),
+      JSON.stringify({ 
+        ResultCode: 0,
+        ResultDesc: "Callback processed successfully" 
+      }),
       { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
 
   } catch (error) {
-    console.error('Error processing callback:', error)
+    console.error('MPESA Callback error:', error)
 
     // Log the error
     try {
-      const payload = await req.json().catch(() => null)
-      const clientIP = req.headers.get('x-forwarded-for') || 'unknown'
-      
-      await logCallbackError(
-        payload,
-        'Callback processing error',
-        { error: error.message, stack: error.stack },
-        clientIP
+      const supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       )
+
+      await supabaseClient
+        .from('mpesa_callback_errors')
+        .insert([{
+          callback_payload: await req.json().catch(() => ({})),
+          error_message: error.message || 'Unknown error',
+          error_details: { stack: error.stack },
+          ip_address: req.headers.get('x-forwarded-for') || 'unknown'
+        }])
     } catch (logError) {
-      console.error('Failed to log callback error:', logError)
+      console.error('Failed to log error:', logError)
     }
 
-    // Always return OK to Safaricom even on error
     return new Response(
-      JSON.stringify({ status: 'OK' }),
+      JSON.stringify({ 
+        ResultCode: 1,
+        ResultDesc: "Internal server error" 
+      }),
       { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        status: 200, // Still return 200 to acknowledge receipt
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
   }

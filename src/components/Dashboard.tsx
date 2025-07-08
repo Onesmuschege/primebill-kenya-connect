@@ -21,6 +21,8 @@ import { PlansManagement } from './PlansManagement';
 import { ClientsManagement } from './ClientsManagement';
 import { PaymentsManagement } from './PaymentsManagement';
 import { RoutersManagement } from './RoutersManagement';
+import { UserDashboard } from './UserDashboard';
+import { ProfileManagement } from './ProfileManagement';
 
 interface DashboardStats {
   totalClients: number;
@@ -42,8 +44,12 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardStats();
-  }, []);
+    if (user?.role === 'admin' || user?.role === 'subadmin') {
+      fetchDashboardStats();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   const fetchDashboardStats = async () => {
     try {
@@ -134,27 +140,20 @@ export const Dashboard = () => {
 
 const ClientDashboard = () => {
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-gray-900">Your Account</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Current Plan</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">No active subscription</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">No payments yet</p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <Tabs defaultValue="dashboard" className="space-y-6">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+        <TabsTrigger value="profile">Profile</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="dashboard">
+        <UserDashboard />
+      </TabsContent>
+      
+      <TabsContent value="profile">
+        <ProfileManagement />
+      </TabsContent>
+    </Tabs>
   );
 };
 
