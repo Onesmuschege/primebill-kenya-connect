@@ -1,14 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Wifi, MapPin, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, Wifi, WifiOff, Settings } from 'lucide-react';
 
 interface Router {
   id: string;
@@ -17,26 +15,24 @@ interface Router {
   api_port: number;
   username: string;
   password_encrypted: string;
-  status: string;
+  status: 'online' | 'offline' | 'maintenance';
   last_seen: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export const RoutersManagement = () => {
   const [routers, setRouters] = useState<Router[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingRouter, setEditingRouter] = useState<Router | null>(null);
-  const { toast } = useToast();
-
-  const [formData, setFormData] = useState({
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newRouter, setNewRouter] = useState({
     location_name: '',
     ip_address: '',
-    api_port: '8728',
+    api_port: 8728,
     username: '',
-    password: '',
-    status: 'offline',
+    password_encrypted: '',
   });
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchRouters();
@@ -50,7 +46,14 @@ export const RoutersManagement = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setRouters(data || []);
+      
+      // Type assertion to handle the ip_address field
+      const routersData = (data || []).map(router => ({
+        ...router,
+        ip_address: String(router.ip_address),
+      })) as Router[];
+      
+      setRouters(routersData);
     } catch (error) {
       console.error('Error fetching routers:', error);
       toast({
@@ -63,108 +66,62 @@ export const RoutersManagement = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const routerData = {
-        location_name: formData.location_name,
-        ip_address: formData.ip_address,
-        api_port: parseInt(formData.api_port),
-        username: formData.username,
-        password_encrypted: formData.password, // In production, this should be properly encrypted
-        status: formData.status as 'online' | 'offline' | 'maintenance',
-      };
-
-      if (editingRouter) {
-        const { error } = await supabase
-          .from('routers')
-          .update(routerData)
-          .eq('id', editingRouter.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('routers')
-          .insert([routerData]);
-        if (error) throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: `Router ${editingRouter ? 'updated' : 'created'} successfully`,
-      });
-
-      setDialogOpen(false);
-      resetForm();
-      fetchRouters();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      location_name: '',
-      ip_address: '',
-      api_port: '8728',
-      username: '',
-      password: '',
-      status: 'offline',
-    });
-    setEditingRouter(null);
-  };
-
-  const handleEdit = (router: Router) => {
-    setEditingRouter(router);
-    setFormData({
-      location_name: router.location_name,
-      ip_address: router.ip_address,
-      api_port: router.api_port.toString(),
-      username: router.username,
-      password: '', // Don't prefill password for security
-      status: router.status,
-    });
-    setDialogOpen(true);
-  };
-
-  const handleDelete = async (routerId: string) => {
-    if (!confirm('Are you sure you want to delete this router?')) return;
-
+  const handleAddRouter = async () => {
     try {
       const { error } = await supabase
         .from('routers')
-        .delete()
-        .eq('id', routerId);
+        .insert([newRouter]);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Router deleted successfully",
+        description: "Router added successfully",
+      });
+
+      setShowAddForm(false);
+      setNewRouter({
+        location_name: '',
+        ip_address: '',
+        api_port: 8728,
+        username: '',
+        password_encrypted: '',
       });
       fetchRouters();
-    } catch (error: any) {
+    } catch (error) {
+      console.error('Error adding router:', error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to add router",
         variant: "destructive",
       });
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'online':
+        return <Wifi className="h-4 w-4 text-green-600" />;
+      case 'offline':
+        return <WifiOff className="h-4 w-4 text-red-600" />;
+      case 'maintenance':
+        return <Settings className="h-4 w-4 text-yellow-600" />;
+      default:
+        return <WifiOff className="h-4 w-4 text-gray-600" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     const variants = {
       online: 'default',
-      offline: 'secondary',
-      maintenance: 'destructive',
+      offline: 'destructive',
+      maintenance: 'secondary',
     } as const;
     
     return (
       <Badge variant={variants[status as keyof typeof variants] || 'secondary'}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {getStatusIcon(status)}
+        <span className="ml-1">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
       </Badge>
     );
   };
@@ -177,138 +134,103 @@ export const RoutersManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Router Management</h3>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Router
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingRouter ? 'Edit Router' : 'Add New Router'}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="location">Location Name</Label>
-                <Input
-                  id="location"
-                  value={formData.location_name}
-                  onChange={(e) => setFormData({ ...formData, location_name: e.target.value })}
-                  placeholder="e.g., Main Office, Branch A"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ip">IP Address</Label>
-                  <Input
-                    id="ip"
-                    value={formData.ip_address}
-                    onChange={(e) => setFormData({ ...formData, ip_address: e.target.value })}
-                    placeholder="192.168.1.1"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="port">API Port</Label>
-                  <Input
-                    id="port"
-                    type="number"
-                    value={formData.api_port}
-                    onChange={(e) => setFormData({ ...formData, api_port: e.target.value })}
-                    placeholder="8728"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={editingRouter ? "Leave blank to keep current password" : ""}
-                  required={!editingRouter}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                >
-                  <option value="offline">Offline</option>
-                  <option value="online">Online</option>
-                  <option value="maintenance">Maintenance</option>
-                </select>
-              </div>
-              <Button type="submit" className="w-full">
-                {editingRouter ? 'Update Router' : 'Add Router'}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setShowAddForm(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Router
+        </Button>
       </div>
+
+      {showAddForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Add New Router</CardTitle>
+            <CardDescription>Configure a new MikroTik router</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Location Name</label>
+                <Input
+                  value={newRouter.location_name}
+                  onChange={(e) => setNewRouter({ ...newRouter, location_name: e.target.value })}
+                  placeholder="e.g., Nairobi Central"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">IP Address</label>
+                <Input
+                  value={newRouter.ip_address}
+                  onChange={(e) => setNewRouter({ ...newRouter, ip_address: e.target.value })}
+                  placeholder="192.168.1.1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">API Port</label>
+                <Input
+                  type="number"
+                  value={newRouter.api_port}
+                  onChange={(e) => setNewRouter({ ...newRouter, api_port: parseInt(e.target.value) })}
+                  placeholder="8728"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Username</label>
+                <Input
+                  value={newRouter.username}
+                  onChange={(e) => setNewRouter({ ...newRouter, username: e.target.value })}
+                  placeholder="admin"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium mb-1">Password</label>
+                <Input
+                  type="password"
+                  value={newRouter.password_encrypted}
+                  onChange={(e) => setNewRouter({ ...newRouter, password_encrypted: e.target.value })}
+                  placeholder="Router password"
+                />
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleAddRouter}>Add Router</Button>
+              <Button variant="outline" onClick={() => setShowAddForm(false)}>Cancel</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {routers.map((router) => (
           <Card key={router.id}>
             <CardHeader>
               <div className="flex justify-between items-start">
-                <CardTitle className="text-lg flex items-center">
-                  <MapPin className="h-5 w-5 mr-2" />
-                  {router.location_name}
-                </CardTitle>
+                <CardTitle className="text-lg">{router.location_name}</CardTitle>
                 {getStatusBadge(router.status)}
               </div>
+              <CardDescription>{router.ip_address}:{router.api_port}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Wifi className="h-4 w-4 mr-2" />
-                  {router.ip_address}:{router.api_port}
-                </div>
-                <div className="text-sm text-gray-600">
-                  Username: <span className="font-mono">{router.username}</span>
+            <CardContent>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="font-medium">Username:</span> {router.username}
                 </div>
                 {router.last_seen && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-2" />
-                    Last seen: {new Date(router.last_seen).toLocaleString()}
+                  <div>
+                    <span className="font-medium">Last Seen:</span>{' '}
+                    {new Date(router.last_seen).toLocaleString()}
                   </div>
                 )}
+                <div>
+                  <span className="font-medium">Added:</span>{' '}
+                  {new Date(router.created_at).toLocaleDateString()}
+                </div>
               </div>
-              
-              <div className="flex space-x-2 pt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(router)}
-                >
+              <div className="flex space-x-2 mt-4">
+                <Button size="sm" variant="outline">
                   <Edit className="h-4 w-4 mr-1" />
                   Edit
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDelete(router.id)}
-                  className="text-red-600 hover:text-red-700"
-                >
+                <Button size="sm" variant="destructive">
                   <Trash2 className="h-4 w-4 mr-1" />
                   Delete
                 </Button>
@@ -322,9 +244,7 @@ export const RoutersManagement = () => {
         <div className="text-center py-8">
           <Wifi className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No routers configured</h3>
-          <p className="text-gray-500">
-            Add your first router to start managing network access.
-          </p>
+          <p className="text-gray-500">Add your first MikroTik router to get started.</p>
         </div>
       )}
     </div>
