@@ -271,6 +271,120 @@ export type Database = {
           },
         ]
       }
+      usage_statistics: {
+        Row: {
+          bytes_downloaded: number | null
+          bytes_uploaded: number | null
+          created_at: string | null
+          date: string
+          id: string
+          peak_speed_mbps: number | null
+          session_duration: number | null
+          subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bytes_downloaded?: number | null
+          bytes_uploaded?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          peak_speed_mbps?: number | null
+          session_duration?: number | null
+          subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bytes_downloaded?: number | null
+          bytes_uploaded?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          peak_speed_mbps?: number | null
+          session_duration?: number | null
+          subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_statistics_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usage_statistics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_connections: {
+        Row: {
+          bytes_downloaded: number | null
+          bytes_uploaded: number | null
+          connection_end: string | null
+          connection_start: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          mac_address: string | null
+          router_id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bytes_downloaded?: number | null
+          bytes_uploaded?: number | null
+          connection_end?: string | null
+          connection_start?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          mac_address?: string | null
+          router_id: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bytes_downloaded?: number | null
+          bytes_uploaded?: number | null
+          connection_end?: string | null
+          connection_start?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          mac_address?: string | null
+          router_id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_connections_router_id_fkey"
+            columns: ["router_id"]
+            isOneToOne: false
+            referencedRelation: "routers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string

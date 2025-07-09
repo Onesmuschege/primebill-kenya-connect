@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.subscription-manager]
 verify_jwt = false
+
+[functions.router-control]
+verify_jwt = false

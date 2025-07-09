@@ -7,8 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const GRACE_PERIOD_DAYS = 3
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -22,7 +23,6 @@ serve(async (req) => {
     const { action } = await req.json().catch(() => ({ action: 'expire_subscriptions' }))
 
     if (action === 'create_subscription') {
-      // This is called after successful payment to create subscription
       const { user_id, plan_id, payment_id } = await req.json()
       
       console.log(`Creating subscription for user ${user_id}, plan ${plan_id}`)
@@ -41,6 +41,13 @@ serve(async (req) => {
           { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
+
+      // Get user details
+      const { data: user } = await supabaseClient
+        .from('users')
+        .select('*')
+        .eq('id', user_id)
+        .single()
 
       // Calculate dates
       const startDate = new Date()
@@ -70,6 +77,30 @@ serve(async (req) => {
         )
       }
 
+      // Create user on router (call router-control function)
+      try {
+        const { data: routers } = await supabaseClient
+          .from('routers')
+          .select('*')
+          .eq('status', 'online')
+          .limit(1)
+
+        if (routers && routers.length > 0) {
+          await supabaseClient.functions.invoke('router-control', {
+            body: {
+              action: 'create_user',
+              user_id: user_id,
+              router_id: routers[0].id,
+              username: user?.phone,
+              profile: `Plan_${plan.speed_limit_mbps}M`
+            }
+          })
+        }
+      } catch (routerError) {
+        console.error('Router control error:', routerError)
+        // Don't fail subscription creation if router fails
+      }
+
       // Log activity
       await supabaseClient.rpc('log_activity', {
         p_user_id: user_id,
@@ -93,18 +124,66 @@ serve(async (req) => {
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+
+    } else if (action === 'check_expiring_soon') {
+      // Check for subscriptions expiring in 3 days for notifications
+      const threeDaysFromNow = new Date()
+      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
+      
+      const { data: expiringSoon, error: expiringError } = await supabaseClient
+        .from('subscriptions')
+        .select(`
+          id, user_id, end_date, auto_renew,
+          users(name, email, phone),
+          plans(name, price_kes)
+        `)
+        .eq('status', 'active')
+        .eq('end_date', threeDaysFromNow.toISOString().split('T')[0])
+
+      if (expiringSoon && expiringSoon.length > 0) {
+        for (const sub of expiringSoon) {
+          // Log renewal reminder
+          await supabaseClient.rpc('log_activity', {
+            p_user_id: sub.user_id,
+            p_action: 'renewal_reminder_sent',
+            p_details: {
+              subscription_id: sub.id,
+              expiry_date: sub.end_date,
+              plan_name: sub.plans?.name
+            }
+          })
+        }
+
+        console.log(`Sent renewal reminders for ${expiringSoon.length} subscriptions`)
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          reminders_sent: expiringSoon?.length || 0 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+
     } else {
-      // Default action: expire subscriptions (cron job)
+      // Default action: expire subscriptions with grace period handling
       console.log('Running subscription expiry check...')
 
-      // Get all active subscriptions that have expired
       const today = new Date().toISOString().split('T')[0]
+      const gracePeriodDate = new Date()
+      gracePeriodDate.setDate(gracePeriodDate.getDate() - GRACE_PERIOD_DAYS)
+      const gracePeriodDateStr = gracePeriodDate.toISOString().split('T')[0]
       
+      // Get subscriptions that have exceeded grace period
       const { data: expiredSubs, error: fetchError } = await supabaseClient
         .from('subscriptions')
-        .select('id, user_id, end_date, plans(name)')
+        .select(`
+          id, user_id, end_date, 
+          users(phone),
+          plans(name, speed_limit_mbps)
+        `)
         .eq('status', 'active')
-        .lt('end_date', today)
+        .lt('end_date', gracePeriodDateStr)
 
       if (fetchError) {
         console.error('Error fetching expired subscriptions:', fetchError)
@@ -122,7 +201,7 @@ serve(async (req) => {
         )
       }
 
-      console.log(`Found ${expiredSubs.length} expired subscriptions`)
+      console.log(`Found ${expiredSubs.length} expired subscriptions (beyond grace period)`)
 
       // Update expired subscriptions
       const expiredIds = expiredSubs.map(sub => sub.id)
@@ -143,15 +222,41 @@ serve(async (req) => {
         )
       }
 
-      // Log activities for each expired subscription
+      // Disconnect users from routers
       for (const sub of expiredSubs) {
+        try {
+          // Get active router for user
+          const { data: connections } = await supabaseClient
+            .from('user_connections')
+            .select('router_id')
+            .eq('user_id', sub.user_id)
+            .eq('status', 'active')
+            .limit(1)
+
+          if (connections && connections.length > 0) {
+            await supabaseClient.functions.invoke('router-control', {
+              body: {
+                action: 'disconnect_user',
+                user_id: sub.user_id,
+                router_id: connections[0].router_id,
+                username: sub.users?.phone
+              }
+            })
+          }
+        } catch (routerError) {
+          console.error('Router disconnect error:', routerError)
+          // Continue with other users even if one fails
+        }
+
+        // Log activity
         await supabaseClient.rpc('log_activity', {
           p_user_id: sub.user_id,
           p_action: 'subscription_expired',
           p_details: {
             subscription_id: sub.id,
             plan_name: sub.plans?.name || 'Unknown Plan',
-            end_date: sub.end_date
+            end_date: sub.end_date,
+            grace_period_exceeded: true
           }
         })
       }
