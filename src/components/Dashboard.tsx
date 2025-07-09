@@ -21,7 +21,7 @@ import { PlansManagement } from './PlansManagement';
 import { ClientsManagement } from './ClientsManagement';
 import { PaymentsManagement } from './PaymentsManagement';
 import { RoutersManagement } from './RoutersManagement';
-import { UserDashboard } from './UserDashboard';
+import UserDashboard from './UserDashboard';
 import { ProfileManagement } from './ProfileManagement';
 
 interface DashboardStats {

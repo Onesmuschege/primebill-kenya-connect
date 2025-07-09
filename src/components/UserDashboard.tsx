@@ -8,8 +8,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, Wifi, AlertTriangle, CreditCard, TrendingUp, Settings } from 'lucide-react';
-import PaymentForm from './PaymentForm';
-import PaymentHistory from './PaymentHistory';
+import { PaymentForm } from './PaymentForm';
+import { PaymentHistory } from './PaymentHistory';
 import UsageStatistics from './UsageStatistics';
 import PlanUpgrade from './PlanUpgrade';
 
@@ -141,7 +141,7 @@ const UserDashboard = () => {
   const getStatusColor = () => {
     const daysRemaining = getDaysRemaining();
     if (daysRemaining <= 0) return 'destructive';
-    if (daysRemaining <= 3) return 'warning';
+    if (daysRemaining <= 3) return 'secondary';
     return 'default';
   };
 

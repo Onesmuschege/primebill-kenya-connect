@@ -20,7 +20,7 @@ interface UsageStats {
 
 interface ConnectionInfo {
   id: string;
-  ip_address: string;
+  ip_address: string | null;
   connection_start: string;
   status: string;
   bytes_downloaded: number;
@@ -74,7 +74,15 @@ const UsageStatistics = () => {
         if (connError) throw connError;
         
         if (connections && connections.length > 0) {
-          setConnectionInfo(connections[0]);
+          const conn = connections[0];
+          setConnectionInfo({
+            id: conn.id,
+            ip_address: conn.ip_address as string | null,
+            connection_start: conn.connection_start,
+            status: conn.status,
+            bytes_downloaded: conn.bytes_downloaded || 0,
+            bytes_uploaded: conn.bytes_uploaded || 0
+          });
         }
       }
 
