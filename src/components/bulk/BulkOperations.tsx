@@ -97,7 +97,12 @@ export function BulkOperations<T>({
     <Checkbox
       checked={isAllSelected}
       ref={(el) => {
-        if (el) el.indeterminate = isIndeterminate;
+        if (el) {
+          const checkboxElement = el.querySelector('button') as HTMLInputElement;
+          if (checkboxElement) {
+            checkboxElement.indeterminate = isIndeterminate;
+          }
+        }
       }}
       onCheckedChange={handleSelectAll}
       disabled={isLoading}
