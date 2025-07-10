@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/AuthForm';
 import { LazyDashboard } from '@/components/lazy/LazyDashboard';
@@ -9,14 +10,27 @@ import { LazyUserDashboard } from '@/components/lazy/LazyUserDashboard';
 import { Toaster } from '@/components/ui/toaster';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SkipToContent } from '@/components/ui/skip-to-content';
+import { AccessibilityProvider } from '@/components/accessibility/AccessibilityProvider';
+import { AnalyticsProvider } from '@/components/analytics/BasicAnalytics';
+import { FullPageLoader } from '@/components/ui/loading-states';
+import { createCSPHeader } from '@/lib/security';
 import './App.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 2,
+      retry: (failureCount, error: any) => {
+        // Don't retry on 4xx errors
+        if (error?.status >= 400 && error?.status < 500) {
+          return false;
+        }
+        return failureCount < 2;
+      },
       refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
     },
   },
 });
@@ -25,12 +39,7 @@ function AppContent() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600" aria-hidden="true"></div>
-        <span className="sr-only">Loading application...</span>
-      </div>
-    );
+    return <FullPageLoader message="Loading application..." />;
   }
 
   if (!user) {
@@ -72,18 +81,36 @@ function App() {
     };
   }, []);
 
+  // Set up security headers
+  useEffect(() => {
+    const cspHeader = createCSPHeader();
+    const metaCSP = document.createElement('meta');
+    metaCSP.httpEquiv = 'Content-Security-Policy';
+    metaCSP.content = cspHeader;
+    document.head.appendChild(metaCSP);
+
+    return () => {
+      document.head.removeChild(metaCSP);
+    };
+  }, []);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <Router>
-          <AuthProvider>
-            <div className="min-h-screen w-full">
-              <SkipToContent />
-              <AppContent />
-              <Toaster />
-            </div>
-          </AuthProvider>
+          <AccessibilityProvider>
+            <AnalyticsProvider trackingId={import.meta.env.VITE_GA_TRACKING_ID}>
+              <AuthProvider>
+                <div className="min-h-screen w-full">
+                  <SkipToContent />
+                  <AppContent />
+                  <Toaster />
+                </div>
+              </AuthProvider>
+            </AnalyticsProvider>
+          </AccessibilityProvider>
         </Router>
+        {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
       </QueryClientProvider>
     </ErrorBoundary>
   );
