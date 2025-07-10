@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,6 +5,7 @@ import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/AuthForm';
 import { Dashboard } from '@/components/Dashboard';
 import { Toaster } from '@/components/ui/toaster';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import './App.css';
 
 const queryClient = new QueryClient();
@@ -26,14 +26,16 @@ function AppContent() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <AuthProvider>
-          <AppContent />
-          <Toaster />
-        </AuthProvider>
-      </Router>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <AuthProvider>
+            <AppContent />
+            <Toaster />
+          </AuthProvider>
+        </Router>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
