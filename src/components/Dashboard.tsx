@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,9 @@ import { PaymentsManagement } from './PaymentsManagement';
 import { RoutersManagement } from './RoutersManagement';
 import UserDashboard from './UserDashboard';
 import { ProfileManagement } from './ProfileManagement';
+import { NotificationCenter } from './NotificationCenter';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface DashboardStats {
   totalClients: number;
@@ -34,6 +36,7 @@ interface DashboardStats {
 
 export const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const { showError } = useNotifications();
   const [stats, setStats] = useState<DashboardStats>({
     totalClients: 0,
     activeSubscriptions: 0,
@@ -72,6 +75,7 @@ export const Dashboard = () => {
       });
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+      showError('Error loading dashboard', 'Failed to load dashboard statistics');
     } finally {
       setLoading(false);
     }
@@ -94,7 +98,7 @@ export const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
@@ -110,6 +114,7 @@ export const Dashboard = () => {
               <h1 className="text-2xl font-bold text-gray-900">PrimeBill Solutions</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <NotificationCenter />
               <div className="text-right">
                 <div className="text-sm text-gray-600">Welcome back,</div>
                 <div className="font-medium text-gray-900 flex items-center gap-2">
