@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { Users, Phone, Mail, Calendar } from 'lucide-react';
 import { SearchAndFilter, FilterOption } from '@/components/search/SearchAndFilter';
 import { useSearchAndFilter } from '@/hooks/useSearchAndFilter';
+import { ExportButton } from '@/components/export/ExportButton';
 
 interface Client {
   id: string;
@@ -44,6 +44,17 @@ export const ClientsManagementImproved = () => {
       { key: 'none', label: 'No Subscription', value: 'none' },
     ],
   };
+
+  // Export headers configuration
+  const exportHeaders = [
+    { label: 'Name', key: 'name' },
+    { label: 'Email', key: 'email' },
+    { label: 'Phone', key: 'phone' },
+    { label: 'Status', key: 'status' },
+    { label: 'Join Date', key: 'created_at' },
+    { label: 'Active Subscription', key: 'subscriptions.0.plans.name' },
+    { label: 'Subscription Status', key: 'subscriptions.0.status' },
+  ];
 
   // Search and filter hook
   const {
@@ -157,12 +168,20 @@ export const ClientsManagementImproved = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="region" aria-label="Client Management">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Client Management</h3>
-        <div className="text-sm text-gray-500">
-          {filteredClients.length} of {clients.length} clients
+        <div>
+          <h3 className="text-lg font-semibold">Client Management</h3>
+          <div className="text-sm text-gray-500" aria-live="polite">
+            {filteredClients.length} of {clients.length} clients
+          </div>
         </div>
+        <ExportButton
+          data={filteredClients}
+          filename={`clients-export-${new Date().toISOString().split('T')[0]}`}
+          headers={exportHeaders}
+          aria-label="Export client data to CSV"
+        />
       </div>
 
       {/* Search and Filter */}
@@ -173,12 +192,13 @@ export const ClientsManagementImproved = () => {
         onFilterChange={handleFilterChange}
         filterOptions={filterOptions}
         placeholder="Search clients by name, email, or phone..."
+        aria-label="Search and filter clients"
       />
 
       {/* Clients Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="grid" aria-label="Clients list">
         {filteredClients.map((client) => (
-          <Card key={client.id}>
+          <Card key={client.id} role="gridcell">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <CardTitle className="text-lg">{client.name}</CardTitle>
@@ -188,16 +208,16 @@ export const ClientsManagementImproved = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center text-sm text-gray-600">
-                  <Mail className="h-4 w-4 mr-2" />
-                  {client.email}
+                  <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
+                  <span>{client.email}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="h-4 w-4 mr-2" />
-                  {client.phone}
+                  <Phone className="h-4 w-4 mr-2" aria-hidden="true" />
+                  <span>{client.phone}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Joined {new Date(client.created_at).toLocaleDateString()}
+                  <Calendar className="h-4 w-4 mr-2" aria-hidden="true" />
+                  <span>Joined {new Date(client.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
 
@@ -205,13 +225,14 @@ export const ClientsManagementImproved = () => {
                 {getSubscriptionStatus(client.subscriptions)}
               </div>
 
-              <div className="flex space-x-2 pt-4">
+              <div className="flex space-x-2 pt-4" role="group" aria-label={`Actions for ${client.name}`}>
                 {client.status === 'active' ? (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => updateClientStatus(client.id, 'suspended')}
                     className="text-red-600 hover:text-red-700"
+                    aria-label={`Suspend ${client.name}`}
                   >
                     Suspend
                   </Button>
@@ -221,6 +242,7 @@ export const ClientsManagementImproved = () => {
                     size="sm"
                     onClick={() => updateClientStatus(client.id, 'active')}
                     className="text-green-600 hover:text-green-700"
+                    aria-label={`Activate ${client.name}`}
                   >
                     Activate
                   </Button>
@@ -232,8 +254,8 @@ export const ClientsManagementImproved = () => {
       </div>
 
       {filteredClients.length === 0 && (
-        <div className="text-center py-8">
-          <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <div className="text-center py-8" role="status" aria-live="polite">
+          <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No clients found</h3>
           <p className="text-gray-500">
             {searchTerm || Object.values(filters).some(f => f) 
