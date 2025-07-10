@@ -2,7 +2,7 @@
 import React, { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
-const Dashboard = React.lazy(() => import('@/components/Dashboard'));
+const Dashboard = React.lazy(() => import('@/components/Dashboard').then(module => ({ default: module.Dashboard })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen" role="status" aria-label="Loading dashboard">

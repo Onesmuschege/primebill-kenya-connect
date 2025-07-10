@@ -2,7 +2,7 @@
 import React, { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
-const PaymentHistory = React.lazy(() => import('@/components/PaymentHistory'));
+const PaymentHistory = React.lazy(() => import('@/components/PaymentHistory').then(module => ({ default: module.PaymentHistory })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center p-8" role="status" aria-label="Loading payment history">
