@@ -110,7 +110,7 @@ function App() {
             </AnalyticsProvider>
           </AccessibilityProvider>
         </Router>
-        {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+        {import.meta.env.DEV && <ReactQueryDevtools />}
       </QueryClientProvider>
     </ErrorBoundary>
   );
