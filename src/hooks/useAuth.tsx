@@ -54,19 +54,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .from('users')
         .select('name, phone, role')
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
-      setUser({
-        ...authUser,
-        name: data.name,
-        phone: data.phone,
-        role: data.role,
-      });
+      if (data) {
+        // User profile exists
+        setUser({
+          ...authUser,
+          name: data.name,
+          phone: data.phone,
+          role: data.role,
+        });
+      } else {
+        // Create user profile from auth metadata
+        const metadata = authUser.user_metadata || {};
+        const userData = {
+          id: authUser.id,
+          email: authUser.email!,
+          name: metadata.name || authUser.email?.split('@')[0] || 'User',
+          phone: metadata.phone || '',
+          role: 'client' as const,
+          status: 'active'
+        };
+
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([userData]);
+
+        if (insertError) {
+          console.error('Error creating user profile:', insertError);
+        }
+
+        setUser({
+          ...authUser,
+          name: userData.name,
+          phone: userData.phone,
+          role: userData.role,
+        });
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      setUser(authUser as AuthUser);
+      // Set user with basic info to prevent infinite loading
+      setUser({
+        ...authUser,
+        name: authUser.email?.split('@')[0] || 'User',
+        phone: '',
+        role: 'client',
+      } as AuthUser);
     }
   };
 
@@ -98,6 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             name,
             phone,
@@ -108,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       toast({
         title: "Success",
-        description: "Account created successfully",
+        description: "Account created successfully! Please check your email to verify your account.",
       });
     } catch (error: any) {
       toast({
