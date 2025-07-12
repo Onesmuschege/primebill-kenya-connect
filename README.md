@@ -94,6 +94,11 @@ npm run dev
 
 ## 🏗️ Project Structure
 
+```sql
+-- See supabase/migrations/ folder for complete setup
+-- Tables: users, plans, subscriptions, payments, routers, etc.
+-- RLS policies and security functions included
+```
 ```
 src/
 ├── components/          # React components
