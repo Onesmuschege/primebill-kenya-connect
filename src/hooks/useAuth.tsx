@@ -52,15 +52,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserProfile = async (authUser: User) => {
     try {
+      console.log('Fetching user profile for:', authUser.id, authUser.email);
+      
       const { data, error } = await supabase
         .from('users')
         .select('name, phone, role')
         .eq('id', authUser.id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
 
       if (data) {
+        console.log('User profile found:', data);
         // User profile exists
         setUser({
           ...authUser,
@@ -69,6 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           role: data.role,
         });
       } else {
+        console.log('No user profile found, creating new one');
         // Create user profile from auth metadata
         const metadata = authUser.user_metadata || {};
         const userData = {
@@ -80,14 +87,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           status: 'active'
         };
 
+        console.log('Creating user profile with data:', userData);
+
         const { error: insertError } = await supabase
           .from('users')
           .insert([userData]);
 
         if (insertError) {
           console.error('Error creating user profile:', insertError);
+          // Still set user to prevent infinite loading
+          setUser({
+            ...authUser,
+            name: userData.name,
+            phone: userData.phone,
+            role: userData.role,
+          });
+          return;
         }
 
+        console.log('User profile created successfully');
         setUser({
           ...authUser,
           name: userData.name,
@@ -96,7 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Error in fetchUserProfile:', error);
       // Set user with basic info to prevent infinite loading
       setUser({
         ...authUser,
