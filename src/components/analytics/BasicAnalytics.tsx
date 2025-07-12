@@ -64,7 +64,7 @@ class Analytics {
     }
 
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('config', 'GA_TRACKING_ID', {
+      (window as any).gtag('config', 'G-ZCFVHHXW85', {
         page_path: path
       });
     }
