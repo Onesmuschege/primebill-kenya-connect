@@ -64,78 +64,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const fetchUserProfile = async (authUser: User) => {
-    try {
-      console.log('Fetching user profile for:', authUser.id, authUser.email);
-      
-      const { data, error } = await supabase
-        .from('users')
-        .select('name, phone, role')
-        .eq('id', authUser.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        throw error;
-      }
-
-      if (data) {
-        console.log('User profile found:', data);
-        // User profile exists
-        setUser({
-          ...authUser,
-          name: data.name,
-          phone: data.phone,
-          role: data.role,
-        });
-      } else {
-        console.log('No user profile found, creating new one');
-        // Create user profile from auth metadata
-        const metadata = authUser.user_metadata || {};
-        const userData = {
-          id: authUser.id,
-          email: authUser.email!,
-          name: metadata.name || authUser.email?.split('@')[0] || 'User',
-          phone: metadata.phone || '',
-          role: 'client' as const,
-          status: 'active'
-        };
-
-        console.log('Creating user profile with data:', userData);
-
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert([userData]);
-
-        if (insertError) {
-          console.error('Error creating user profile:', insertError);
-          // Still set user to prevent infinite loading
-          setUser({
-            ...authUser,
-            name: userData.name,
-            phone: userData.phone,
-            role: userData.role,
-          });
-          return;
-        }
-
-        console.log('User profile created successfully');
-        setUser({
-          ...authUser,
-          name: userData.name,
-          phone: userData.phone,
-          role: userData.role,
-        });
-      }
-    } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
-      // Set user with basic info to prevent infinite loading
-      setUser({
-        ...authUser,
-        name: authUser.email?.split('@')[0] || 'User',
-        phone: '',
-        role: 'client',
-      } as AuthUser);
-    }
+    // Temporary bypass: Just set the user directly without database lookup
+    console.log('Setting user directly without profile lookup');
+    setUser({
+      ...authUser,
+      name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+      phone: authUser.user_metadata?.phone || '',
+      role: 'client',
+    });
   };
 
   const signIn = async (email: string, password: string) => {
