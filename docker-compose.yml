@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+  # Frontend React Application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: primebill-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NODE_ENV=production
+      - VITE_SUPABASE_URL=${SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    restart: unless-stopped
+    networks:
+      - primebill-network
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.primebill.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.primebill.tls=true"
+      - "traefik.http.routers.primebill.tls.certresolver=letsencrypt"
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: primebill-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - primebill-network
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+  # PostgreSQL database (if self-hosting instead of Supabase)
+  postgres:
+    image: postgres:15-alpine
+    container_name: primebill-postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-primebill}
+      - POSTGRES_USER=${POSTGRES_USER:-primebill}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    restart: unless-stopped
+    networks:
+      - primebill-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-primebill}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backup service
+  backup:
+    image: postgres:15-alpine
+    container_name: primebill-backup
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-primebill}
+      - POSTGRES_USER=${POSTGRES_USER:-primebill}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=postgres
+    volumes:
+      - ./backups:/backups
+      - ./scripts:/scripts
+    networks:
+      - primebill-network
+    depends_on:
+      - postgres
+    command: >
+      sh -c "
+        while true; do
+          sleep 86400
+          pg_dump -h postgres -U $$POSTGRES_USER -d $$POSTGRES_DB > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+          find /backups -name '*.sql' -mtime +7 -delete
+        done
+      "
+    restart: unless-stopped
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: primebill-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - primebill-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana for monitoring dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: primebill-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    networks:
+      - primebill-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Traefik reverse proxy (optional)
+  traefik:
+    image: traefik:v2.9
+    container_name: primebill-traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/dynamic:/dynamic:ro
+      - traefik_data:/data
+    networks:
+      - primebill-network
+    restart: unless-stopped
+    profiles:
+      - proxy
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  traefik_data:
+    driver: local
+
+networks:
+  primebill-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

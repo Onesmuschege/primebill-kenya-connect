@@ -1,7 +1,15 @@
 
-# PrimeBill Solutions - Internet Service Provider Management System
+# PrimeBill Solutions - Complete ISP Billing & Management System
 
-A comprehensive ISP management system built with React, TypeScript, Tailwind CSS, and Supabase. This application provides complete customer management, subscription handling, payment processing (M-Pesa integration), and administrative tools for internet service providers.
+**🚀 Production-Ready, Self-Hosted Internet Service Provider (ISP) Billing and Management System**
+
+A comprehensive, fully-featured ISP management system specifically designed for Wireless Internet Service Providers (WISPs) in Kenya. Built with modern technologies and tailored for the Kenyan market with M-Pesa integration, SMS notifications, and MikroTik router support.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
+[![Kenya](https://img.shields.io/badge/Made%20for-Kenya-green.svg)](https://kenya.go.ke)
+
+## 🌟 Complete Feature Set
 
 ## 🚀 Features
 
@@ -42,54 +50,118 @@ A comprehensive ISP management system built with React, TypeScript, Tailwind CSS
 - **Analytics**: Google Analytics 4 (configurable)
 - **Deployment**: Vercel/Netlify ready
 
-## 📦 Installation & Setup
+## 🚀 Quick Start Deployment
 
-### Prerequisites
+### 📋 Prerequisites
 
-- Node.js 18+ and npm
-- Supabase account
-- M-Pesa Daraja API credentials (for payment processing)
+- **Docker & Docker Compose** (recommended)
+- **Linux Server** (Ubuntu 20.04+ recommended)
+- **Domain name** (optional, for SSL)
+- **Supabase account** OR **Self-hosted PostgreSQL**
 
-### 1. Clone the Repository
+### ⚡ One-Command Deploy
 
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/yourusername/primebill-solutions.git
 cd primebill-solutions
-npm install
+
+# Deploy in production mode
+./deploy.sh deploy production
+
+# Or deploy in development mode
+./deploy.sh dev
 ```
 
-### 2. Environment Configuration
+### 🔧 Manual Setup
 
-Create a `.env.local` file:
+#### 1. Clone and Setup
+
+```bash
+git clone https://github.com/yourusername/primebill-solutions.git
+cd primebill-solutions
+cp .env.example .env
+```
+
+#### 2. Configure Environment
+
+Edit `.env` file with your configuration:
 
 ```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# M-Pesa Daraja API
+MPESA_CONSUMER_KEY=your_consumer_key
+MPESA_CONSUMER_SECRET=your_consumer_secret
+MPESA_SHORTCODE=your_shortcode
+MPESA_PASSKEY=your_passkey
+
+# SMS & Email Services
+AFRICAS_TALKING_USERNAME=your_username
+AFRICAS_TALKING_API_KEY=your_api_key
+SENDGRID_API_KEY=your_sendgrid_api_key
+FROM_EMAIL=noreply@yourdomain.com
+
+# System Configuration
+COMPANY_NAME=Your ISP Name
+COMPANY_PHONE=+254700000000
+COMPANY_EMAIL=support@yourdomain.com
 ```
 
-### 3. Database Setup
+#### 3. Database Setup
 
-Run the SQL migrations in your Supabase dashboard:
+**Option A: Using Supabase (Recommended)**
+1. Create a new Supabase project
+2. Run migrations in Supabase SQL Editor:
+   ```sql
+   -- Run files in supabase/migrations/ in order
+   ```
+3. Deploy Edge Functions:
+   ```bash
+   npx supabase functions deploy
+   ```
 
-```sql
--- See supabase/migrations/ folder for complete setup
--- Tables: users, plans, subscriptions, payments, routers, etc.
--- RLS policies and security functions included
+**Option B: Self-hosted PostgreSQL**
+```bash
+# Start with Docker Compose
+docker-compose up -d postgres
 ```
 
-### 4. Configure Supabase Edge Functions
-
-Deploy the included edge functions:
-
-- `mpesa-stk-push`: M-Pesa payment processing
-- `mpesa-callback`: Payment confirmation handling
-- `subscription-manager`: Automated subscription management
-- `router-control`: Network equipment management
-
-### 5. Start Development Server
+#### 4. Deploy Services
 
 ```bash
+# Build and start all services
+docker-compose up --build -d
+
+# Check service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+```
+
+### 🏃‍♂️ Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/primebill-solutions.git
+cd primebill-solutions
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start development server
 npm run dev
+
+# Or use Docker for development
+./deploy.sh dev
 ```
 
 ## 🏗️ Project Structure
