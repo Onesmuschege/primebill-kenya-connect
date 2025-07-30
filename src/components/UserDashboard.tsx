@@ -1,17 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, Wifi, AlertTriangle, CreditCard, TrendingUp, Settings } from 'lucide-react';
 import { PaymentForm } from './PaymentForm';
 import { PaymentHistory } from './PaymentHistory';
 import UsageStatistics from './UsageStatistics';
 import PlanUpgrade from './PlanUpgrade';
+import { UserStats } from './dashboard/UserStats';
+import { PlanOverview } from './dashboard/PlanOverview';
+import { QuickActions } from './dashboard/QuickActions';
+import { AlertsSection } from './dashboard/AlertsSection';
 
 interface Subscription {
   id: string;
@@ -37,14 +37,14 @@ interface User {
   role: string;
 }
 
-const UserDashboard = () => {
+const UserDashboard = React.memo(() => {
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       
@@ -97,12 +97,12 @@ const UserDashboard = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [toast]);
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     setRefreshing(true);
     await fetchUserData();
-  };
+  }, [fetchUserData]);
 
   useEffect(() => {
     fetchUserData();
@@ -127,23 +127,41 @@ const UserDashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchUserData]);
 
-  const getDaysRemaining = () => {
+  const daysRemaining = useMemo(() => {
     if (!subscription) return 0;
     const endDate = new Date(subscription.end_date);
     const now = new Date();
     const diffTime = endDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
-  };
+  }, [subscription]);
 
-  const getStatusColor = () => {
-    const daysRemaining = getDaysRemaining();
-    if (daysRemaining <= 0) return 'destructive';
-    if (daysRemaining <= 3) return 'secondary';
-    return 'default';
-  };
+  // Quick action handlers
+  const handleRenewSubscription = useCallback(() => {
+    // TODO: Implement renew subscription logic
+    toast({
+      title: "Renew Subscription",
+      description: "Feature coming soon!",
+    });
+  }, [toast]);
+
+  const handleUpgradePlan = useCallback(() => {
+    // TODO: Navigate to plan upgrade section
+    toast({
+      title: "Upgrade Plan",
+      description: "Feature coming soon!",
+    });
+  }, [toast]);
+
+  const handleManageAutoRenewal = useCallback(() => {
+    // TODO: Implement auto-renewal management
+    toast({
+      title: "Manage Auto-renewal",
+      description: "Feature coming soon!",
+    });
+  }, [toast]);
 
   if (loading) {
     return (
@@ -152,17 +170,13 @@ const UserDashboard = () => {
           <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader className="h-24 bg-gray-200"></CardHeader>
-              </Card>
+              <div key={i} className="h-24 bg-gray-200 rounded animate-pulse"></div>
             ))}
           </div>
         </div>
       </div>
     );
   }
-
-  const daysRemaining = getDaysRemaining();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -179,89 +193,10 @@ const UserDashboard = () => {
         </div>
 
         {/* Alerts */}
-        {subscription && daysRemaining <= 3 && daysRemaining > 0 && (
-          <Alert className="border-yellow-200 bg-yellow-50">
-            <AlertTriangle className="h-4 w-4 text-yellow-600" />
-            <AlertDescription className="text-yellow-800">
-              Your subscription expires in {daysRemaining} day{daysRemaining !== 1 ? 's' : ''}. 
-              Consider renewing to avoid service interruption.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {subscription && daysRemaining <= 0 && (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              Your subscription has expired. Please renew to restore service.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {!subscription && (
-          <Alert className="border-blue-200 bg-blue-50">
-            <AlertTriangle className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-blue-800">
-              You don't have an active subscription. Choose a plan to get started.
-            </AlertDescription>
-          </Alert>
-        )}
+        <AlertsSection subscription={subscription} daysRemaining={daysRemaining} />
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Current Plan</CardTitle>
-              <Wifi className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {subscription ? subscription.plans.name : 'No Plan'}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {subscription ? `${subscription.plans.speed_limit_mbps} Mbps` : 'Select a plan'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Days Remaining</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {subscription ? Math.max(0, daysRemaining) : 0}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {subscription 
-                  ? `Expires ${new Date(subscription.end_date).toLocaleDateString()}`
-                  : 'No active subscription'
-                }
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Status</CardTitle>
-              <div className="h-4 w-4">
-                <Badge variant={getStatusColor()} className="h-4 px-2 py-0 text-xs">
-                  {subscription 
-                    ? (daysRemaining > 0 ? 'Active' : 'Expired')
-                    : 'Inactive'
-                  }
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {subscription ? `KSh ${subscription.plans.price_kes}` : 'KSh 0'}
-              </div>
-              <p className="text-xs text-muted-foreground">Monthly cost</p>
-            </CardContent>
-          </Card>
-        </div>
+        <UserStats subscription={subscription} daysRemaining={daysRemaining} />
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
@@ -275,6 +210,7 @@ const UserDashboard = () => {
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+<<<<<<< HEAD
               {/* Current Subscription Details */}
               <Card>
                 <CardHeader>
@@ -387,6 +323,14 @@ const UserDashboard = () => {
                   </Button>
                 </CardContent>
               </Card>
+=======
+              <PlanOverview subscription={subscription} />
+              <QuickActions 
+                onRenewSubscription={handleRenewSubscription}
+                onUpgradePlan={handleUpgradePlan}
+                onManageAutoRenewal={handleManageAutoRenewal}
+              />
+>>>>>>> b341bd00c33c8a54f632767e643d4a6cb2101f34
             </div>
           </TabsContent>
 
@@ -411,6 +355,8 @@ const UserDashboard = () => {
       </div>
     </div>
   );
-};
+});
+
+UserDashboard.displayName = 'UserDashboard';
 
 export default UserDashboard;

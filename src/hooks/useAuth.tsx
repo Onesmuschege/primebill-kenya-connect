@@ -27,16 +27,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchUserProfile(session.user);
+    const initializeAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+
+    // Initialize auth
+    initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
+      
       if (session?.user) {
         await fetchUserProfile(session.user);
       } else {
@@ -49,25 +64,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const fetchUserProfile = async (authUser: User) => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('name, phone, role')
-        .eq('id', authUser.id)
-        .single();
-
-      if (error) throw error;
-
-      setUser({
-        ...authUser,
-        name: data.name,
-        phone: data.phone,
-        role: data.role,
-      });
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      setUser(authUser as AuthUser);
-    }
+    // Temporary bypass: Just set the user directly without database lookup
+    console.log('Setting user directly without profile lookup');
+    setUser({
+      ...authUser,
+      name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+      phone: authUser.user_metadata?.phone || '',
+      role: 'client',
+    });
   };
 
   const signIn = async (email: string, password: string) => {
@@ -98,6 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             name,
             phone,
@@ -108,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       toast({
         title: "Success",
-        description: "Account created successfully",
+        description: "Account created successfully! Please check your email to verify your account.",
       });
     } catch (error: any) {
       toast({

@@ -7,15 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Users, 
-  CreditCard, 
   Wifi, 
-  TrendingUp, 
-  Settings, 
-  LogOut,
-  Phone,
-  Mail,
-  Calendar
+  LogOut
 } from 'lucide-react';
 import { PlansManagement } from './PlansManagement';
 import { ClientsManagement } from './ClientsManagement';
@@ -23,6 +16,10 @@ import { PaymentsManagement } from './PaymentsManagement';
 import { RoutersManagement } from './RoutersManagement';
 import UserDashboard from './UserDashboard';
 import { ProfileManagement } from './ProfileManagement';
+import { NotificationCenter } from './NotificationCenter';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useNotifications } from '@/hooks/useNotifications';
+import { AdminStats } from './dashboard/AdminStats';
 
 interface DashboardStats {
   totalClients: number;
@@ -34,6 +31,7 @@ interface DashboardStats {
 
 export const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const { showError } = useNotifications();
   const [stats, setStats] = useState<DashboardStats>({
     totalClients: 0,
     activeSubscriptions: 0,
@@ -72,6 +70,7 @@ export const Dashboard = () => {
       });
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+      showError('Error loading dashboard', 'Failed to load dashboard statistics');
     } finally {
       setLoading(false);
     }
@@ -94,7 +93,7 @@ export const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
@@ -110,6 +109,7 @@ export const Dashboard = () => {
               <h1 className="text-2xl font-bold text-gray-900">PrimeBill Solutions</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <NotificationCenter />
               <div className="text-right">
                 <div className="text-sm text-gray-600">Welcome back,</div>
                 <div className="font-medium text-gray-900 flex items-center gap-2">
@@ -160,54 +160,8 @@ const ClientDashboard = () => {
 const AdminDashboard = ({ stats, userRole }: { stats: DashboardStats; userRole?: string }) => {
   return (
     <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalClients}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.activeSubscriptions}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">KES {stats.totalRevenue.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.pendingPayments}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Online Routers</CardTitle>
-            <Wifi className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.onlineRouters}</div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Stats Grid - Now using the AdminStats component */}
+      <AdminStats stats={stats} />
 
       {/* Management Tabs */}
       <Tabs defaultValue="clients" className="space-y-6">

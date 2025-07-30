@@ -146,20 +146,69 @@ serve(async (req) => {
       }
     })
 
+    // Send notification based on payment status
+    const { data: user } = await supabaseClient
+      .from('users')
+      .select('*')
+      .eq('id', payment.user_id)
+      .single()
+
+    if (user) {
+      if (ResultCode === 0) {
+        // Payment successful notification
+        const successMessage = `Payment successful! KES ${amount} received. Receipt: ${mpesaReceiptNumber}. Your subscription will be activated shortly.`
+        
+        // Send SMS notification
+        await supabaseClient.functions.invoke('sms-notifications', {
+          body: {
+            phone: user.phone,
+            message: successMessage,
+            user_id: user.id,
+            type: 'payment_success'
+          }
+        })
+
+        // Send email notification
+        await supabaseClient.functions.invoke('email-notifications', {
+          body: {
+            email: user.email,
+            subject: 'Payment Successful - PrimeBill Solutions',
+            message: successMessage,
+            user_id: user.id,
+            type: 'payment_success'
+          }
+        })
+      } else {
+        // Payment failed notification
+        const failureMessage = `Payment failed: ${ResultDesc}. Please try again or contact support for assistance.`
+        
+        // Send SMS notification
+        await supabaseClient.functions.invoke('sms-notifications', {
+          body: {
+            phone: user.phone,
+            message: failureMessage,
+            user_id: user.id,
+            type: 'payment_failure'
+          }
+        })
+
+        // Send email notification
+        await supabaseClient.functions.invoke('email-notifications', {
+          body: {
+            email: user.email,
+            subject: 'Payment Failed - PrimeBill Solutions',
+            message: failureMessage,
+            user_id: user.id,
+            type: 'payment_failure'
+          }
+        })
+      }
+    }
+
     // If payment was successful, create subscription
     if (ResultCode === 0) {
       console.log('Payment successful, creating subscription...')
       
-      // Extract plan ID from account reference
-      const accountRef = payment.checkout_request_id ? 
-        await supabaseClient
-          .from('payments')
-          .select('*')
-          .eq('checkout_request_id', CheckoutRequestID)
-          .single()
-          .then(({ data }) => data?.merchant_request_id || '') 
-        : ''
-
       // Try to extract plan ID from the payment record or account reference
       // For now, we'll need to find the plan based on the amount paid
       const { data: matchingPlan, error: planError } = await supabaseClient
@@ -188,6 +237,20 @@ serve(async (req) => {
             console.error('Error creating subscription:', subError)
           } else {
             console.log('Subscription created successfully:', subscriptionResponse)
+            
+            // Send subscription activation notification
+            if (user) {
+              const activationMessage = `Your ${matchingPlan.name} subscription has been activated! Speed: ${matchingPlan.speed_limit_mbps}Mbps, Valid for ${matchingPlan.validity_days} days.`
+              
+              await supabaseClient.functions.invoke('sms-notifications', {
+                body: {
+                  phone: user.phone,
+                  message: activationMessage,
+                  user_id: user.id,
+                  type: 'general'
+                }
+              })
+            }
           }
         } catch (error) {
           console.error('Error calling subscription manager:', error)
