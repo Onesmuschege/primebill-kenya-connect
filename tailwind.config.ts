@@ -19,10 +19,18 @@ export default {
 		},
 		extend: {
 			colors: {
+				// Cybersecurity theme colors
+				background: '#0B0F1A',
+				navy: '#1A1A2E',
+				neonBlue: '#00BFFF',
+				neonGreen: '#39FF14',
+				cyberPurple: '#5D3FD3',
+				terminalGreen: '#00FF41',
+				
+				// Existing shadcn colors (preserved for compatibility)
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
@@ -63,6 +71,17 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				mono: ['IBM Plex Mono', 'Share Tech Mono', 'monospace'],
+				futuristic: ['Orbitron', 'ui-sans-serif'],
+			},
+			boxShadow: {
+				neumorphic: 'inset 4px 4px 10px #05080F, 4px 4px 10px #121B2A',
+				glow: '0 0 10px #00BFFF',
+				'glow-green': '0 0 10px #39FF14',
+				'glow-purple': '0 0 10px #5D3FD3',
+				'glow-cyan': '0 0 10px #00BFFF',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -84,11 +103,26 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'pulse-glow': {
+					'0%, 100%': { boxShadow: '0 0 5px #00BFFF' },
+					'50%': { boxShadow: '0 0 20px #00BFFF, 0 0 30px #00BFFF' }
+				},
+				'terminal-cursor': {
+					'0%, 50%': { opacity: '1' },
+					'51%, 100%': { opacity: '0' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+				'terminal-cursor': 'terminal-cursor 1s infinite'
 			}
 		}
 	},

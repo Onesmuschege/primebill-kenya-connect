@@ -1,42 +1,108 @@
+/* Cybersecurity Theme App Styles */
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #0B0F1A;
+  color: #00BFFF;
+  min-height: 100vh;
 }
 
+/* Terminal/Cybersecurity logo effects */
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
+  filter: drop-shadow(0 0 10px #00BFFF);
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 20px #00BFFF) drop-shadow(0 0 30px #00BFFF);
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.logo.cyber:hover {
+  filter: drop-shadow(0 0 20px #39FF14) drop-shadow(0 0 30px #39FF14);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Cybersecurity pulse animation */
+@keyframes cyber-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes matrix-rain {
+  0% {
+    transform: translateY(-100vh);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .cyber-pulse {
+    animation: cyber-pulse 2s ease-in-out infinite;
+  }
+  
+  .matrix-char {
+    animation: matrix-rain 3s linear infinite;
   }
 }
 
-.card {
+/* Cybersecurity card styling */
+.cyber-card {
   padding: 2em;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 191, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.read-the-docs {
-  color: #888;
+/* Terminal text effect */
+.terminal-text {
+  color: #00FF41;
+  font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
+  letter-spacing: 0.1em;
+}
+
+/* Neon text glow */
+.neon-glow {
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+}
+
+/* Scrollbar styling for cybersecurity theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1A1A2E;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00BFFF;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #39FF14;
 }
