@@ -27,60 +27,70 @@ interface AdminStatsProps {
 }
 
 export const AdminStats = React.memo(({ stats }: AdminStatsProps) => {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-KE', {
+      style: 'currency',
+      currency: 'KES',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 animate-fade-in">
-      <Card className="hover:shadow-glow-cyan transition-all duration-300">
+      <Card className="professional-card border-l-4 border-isp-blue-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium font-mono text-cyan-400">TOTAL CLIENTS</CardTitle>
-          <Shield className="h-4 w-4 text-neonBlue" />
+          <CardTitle className="text-sm font-medium text-gray-600">Total Clients</CardTitle>
+          <Users className="h-5 w-5 text-isp-blue-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-neonGreen font-mono">{stats.totalClients}</div>
-          <p className="text-xs text-gray-400 font-mono mt-1">Active users</p>
+          <div className="text-3xl font-bold text-gray-900">{stats.totalClients}</div>
+          <p className="text-xs text-gray-500 mt-1">Registered users</p>
         </CardContent>
       </Card>
       
-      <Card className="hover:shadow-glow-green transition-all duration-300">
+      <Card className="professional-card border-l-4 border-isp-teal-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium font-mono text-cyan-400">SUBSCRIPTIONS</CardTitle>
-          <Activity className="h-4 w-4 text-neonGreen animate-pulse" />
+          <CardTitle className="text-sm font-medium text-gray-600">Active Subscriptions</CardTitle>
+          <Activity className="h-5 w-5 text-isp-teal-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-neonBlue font-mono">{stats.activeSubscriptions}</div>
-          <p className="text-xs text-gray-400 font-mono mt-1">Active plans</p>
+          <div className="text-3xl font-bold text-gray-900">{stats.activeSubscriptions}</div>
+          <p className="text-xs text-gray-500 mt-1">Active plans</p>
         </CardContent>
       </Card>
       
-      <Card className="hover:shadow-glow-purple transition-all duration-300">
+      <Card className="professional-card border-l-4 border-green-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium font-mono text-cyan-400">REVENUE</CardTitle>
-          <DollarSign className="h-4 w-4 text-cyberPurple" />
+          <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+          <DollarSign className="h-5 w-5 text-green-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-cyberPurple font-mono">KES {stats.totalRevenue.toLocaleString()}</div>
-          <p className="text-xs text-gray-400 font-mono mt-1">Total earned</p>
+          <div className="text-3xl font-bold text-gray-900">
+            {formatCurrency(stats.totalRevenue)}
+          </div>
+          <p className="text-xs text-gray-500 mt-1">Total earnings</p>
         </CardContent>
       </Card>
       
-      <Card className="hover:shadow-glow-cyan transition-all duration-300">
+      <Card className="professional-card border-l-4 border-isp-coral-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium font-mono text-cyan-400">PENDING</CardTitle>
-          <Database className="h-4 w-4 text-neonBlue" />
+          <CardTitle className="text-sm font-medium text-gray-600">Pending Payments</CardTitle>
+          <CreditCard className="h-5 w-5 text-isp-coral-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-yellow-400 font-mono">{stats.pendingPayments}</div>
-          <p className="text-xs text-gray-400 font-mono mt-1">Awaiting payment</p>
+          <div className="text-3xl font-bold text-gray-900">{stats.pendingPayments}</div>
+          <p className="text-xs text-gray-500 mt-1">Payments due</p>
         </CardContent>
       </Card>
       
-      <Card className="hover:shadow-glow-green transition-all duration-300">
+      <Card className="professional-card border-l-4 border-purple-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium font-mono text-cyan-400">ROUTERS</CardTitle>
-          <Network className="h-4 w-4 text-neonGreen" />
+          <CardTitle className="text-sm font-medium text-gray-600">Online Routers</CardTitle>
+          <Wifi className="h-5 w-5 text-purple-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-neonGreen font-mono">{stats.onlineRouters}</div>
-          <p className="text-xs text-gray-400 font-mono mt-1">Online devices</p>
+          <div className="text-3xl font-bold text-gray-900">{stats.onlineRouters}</div>
+          <p className="text-xs text-gray-500 mt-1">Network devices</p>
         </CardContent>
       </Card>
     </div>
