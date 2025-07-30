@@ -95,7 +95,6 @@ function App() {
     metaCSP.httpEquiv = 'Content-Security-Policy';
     metaCSP.content = cspHeader;
     document.head.appendChild(metaCSP);
-
     return () => {
       document.head.removeChild(metaCSP);
     };

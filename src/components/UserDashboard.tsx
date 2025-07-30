@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -52,7 +51,6 @@ const UserDashboard = React.memo(() => {
         throw new Error('Not authenticated');
       }
 
-      // Fetch user profile
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
@@ -61,7 +59,6 @@ const UserDashboard = React.memo(() => {
 
       if (userError) throw userError;
 
-      // Fetch active subscription with plan details
       const { data: subData, error: subError } = await supabase
         .from('subscriptions')
         .select(`
@@ -107,7 +104,6 @@ const UserDashboard = React.memo(() => {
   useEffect(() => {
     fetchUserData();
 
-    // Set up real-time subscription for subscription updates
     const channel = supabase
       .channel('user-dashboard')
       .on(
@@ -138,9 +134,7 @@ const UserDashboard = React.memo(() => {
     return diffDays;
   }, [subscription]);
 
-  // Quick action handlers
   const handleRenewSubscription = useCallback(() => {
-    // TODO: Implement renew subscription logic
     toast({
       title: "Renew Subscription",
       description: "Feature coming soon!",
@@ -148,7 +142,6 @@ const UserDashboard = React.memo(() => {
   }, [toast]);
 
   const handleUpgradePlan = useCallback(() => {
-    // TODO: Navigate to plan upgrade section
     toast({
       title: "Upgrade Plan",
       description: "Feature coming soon!",
@@ -156,7 +149,6 @@ const UserDashboard = React.memo(() => {
   }, [toast]);
 
   const handleManageAutoRenewal = useCallback(() => {
-    // TODO: Implement auto-renewal management
     toast({
       title: "Manage Auto-renewal",
       description: "Feature coming soon!",
@@ -210,127 +202,12 @@ const UserDashboard = React.memo(() => {
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-<<<<<<< HEAD
-              {/* Current Subscription Details */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Subscription Details</CardTitle>
-                  <CardDescription>Your current plan information</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {subscription ? (
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Plan:</span>
-                        <span className="font-medium">{subscription.plans.name}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Speed:</span>
-                        <span className="font-medium">{subscription.plans.speed_limit_mbps} Mbps</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Started:</span>
-                        <span className="font-medium">
-                          {new Date(subscription.start_date).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Expires:</span>
-                        <span className="font-medium">
-                          {new Date(subscription.end_date).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Auto-renew:</span>
-                        <Badge variant={subscription.auto_renew ? 'default' : 'secondary'}>
-                          {subscription.auto_renew ? 'Enabled' : 'Disabled'}
-                        </Badge>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">No active subscription</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                  <CardDescription>Manage your subscription</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* Added onClick handlers to implement subscription renewal and upgrade flows */}
-                  <Button
-                    className="w-full"
-                    size="sm"
-                    onClick={async () => {
-                      // Implement subscription renewal flow
-                      if (!subscription) {
-                        toast({
-                          title: "No active subscription",
-                          description: "You do not have an active subscription to renew.",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      try {
-                        // Example: Call a supabase function or API to initiate renewal
-                        const { error } = await supabase.functions.invoke('subscription-renewal', {
-                          body: JSON.stringify({ subscriptionId: subscription.id }),
-                        });
-                        if (error) throw error;
-                        toast({
-                          title: "Renewal initiated",
-                          description: "Your subscription renewal has been initiated. Please check your email for confirmation.",
-                          variant: "default",
-                        });
-                      } catch (error) {
-                        toast({
-                          title: "Renewal failed",
-                          description: (error as Error).message || "Failed to initiate renewal.",
-                          variant: "destructive",
-                        });
-                      }
-                    }}
-                  >
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Renew Subscription
-                  </Button>
-                  <Button
-                    className="w-full"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      // TODO: Implement plan upgrade flow
-                      alert('Upgrade Plan flow to be implemented');
-                    }}
-                  >
-                    <TrendingUp className="mr-2 h-4 w-4" />
-                    Upgrade Plan
-                  </Button>
-                  <Button
-                    className="w-full"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      // TODO: Implement auto-renewal management flow
-                      alert('Manage Auto-renewal flow to be implemented');
-                    }}
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Manage Auto-renewal
-                  </Button>
-                </CardContent>
-              </Card>
-=======
               <PlanOverview subscription={subscription} />
               <QuickActions 
                 onRenewSubscription={handleRenewSubscription}
                 onUpgradePlan={handleUpgradePlan}
                 onManageAutoRenewal={handleManageAutoRenewal}
               />
->>>>>>> b341bd00c33c8a54f632767e643d4a6cb2101f34
             </div>
           </TabsContent>
 
