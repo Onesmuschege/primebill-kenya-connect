@@ -142,6 +142,34 @@ serve(async (req) => {
 
       if (expiringSoon && expiringSoon.length > 0) {
         for (const sub of expiringSoon) {
+          const user = sub.users
+          const plan = sub.plans
+          
+          if (user && plan) {
+            const reminderMessage = `Your ${plan.name} subscription expires in 3 days (${sub.end_date}). Renew now for KES ${plan.price_kes} to avoid disconnection.`
+            
+            // Send SMS notification
+            await supabaseClient.functions.invoke('sms-notifications', {
+              body: {
+                phone: user.phone,
+                message: reminderMessage,
+                user_id: sub.user_id,
+                type: 'subscription_reminder'
+              }
+            })
+
+            // Send email notification
+            await supabaseClient.functions.invoke('email-notifications', {
+              body: {
+                email: user.email,
+                subject: 'Subscription Expiring Soon - Renew Now',
+                message: reminderMessage,
+                user_id: sub.user_id,
+                type: 'subscription_reminder'
+              }
+            })
+          }
+
           // Log renewal reminder
           await supabaseClient.rpc('log_activity', {
             p_user_id: sub.user_id,
@@ -222,7 +250,7 @@ serve(async (req) => {
         )
       }
 
-      // Disconnect users from routers
+      // Disconnect users from routers and send notifications
       for (const sub of expiredSubs) {
         try {
           // Get active router for user
@@ -242,6 +270,40 @@ serve(async (req) => {
                 username: sub.users?.phone
               }
             })
+          }
+
+          // Send expiry notification
+          if (sub.users?.phone) {
+            const expiryMessage = `Your ${sub.plans?.name || 'internet'} subscription has expired and you have been disconnected. Renew now to restore your internet access.`
+            
+            // Send SMS notification
+            await supabaseClient.functions.invoke('sms-notifications', {
+              body: {
+                phone: sub.users.phone,
+                message: expiryMessage,
+                user_id: sub.user_id,
+                type: 'subscription_expiry'
+              }
+            })
+
+            // Get user email for email notification
+            const { data: userDetails } = await supabaseClient
+              .from('users')
+              .select('email')
+              .eq('id', sub.user_id)
+              .single()
+
+            if (userDetails?.email) {
+              await supabaseClient.functions.invoke('email-notifications', {
+                body: {
+                  email: userDetails.email,
+                  subject: 'Subscription Expired - Renew to Restore Access',
+                  message: expiryMessage,
+                  user_id: sub.user_id,
+                  type: 'subscription_expiry'
+                }
+              })
+            }
           }
         } catch (routerError) {
           console.error('Router disconnect error:', routerError)
