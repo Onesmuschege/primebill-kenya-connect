@@ -6,15 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Shield, 
-  LogOut,
-  Terminal,
-  Network,
-  Activity
-} from 'lucide-react';
 import { PlansManagement } from './PlansManagement';
-import { ClientsManagement } from './ClientsManagement';
+import { ClientsManagementEnhanced } from './ClientsManagementEnhanced';
 import { PaymentsManagement } from './PaymentsManagement';
 import { RoutersManagement } from './RoutersManagement';
 import UserDashboard from './UserDashboard';
@@ -23,6 +16,8 @@ import { NotificationCenter } from './NotificationCenter';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useNotifications } from '@/hooks/useNotifications';
 import { AdminStats } from './dashboard/AdminStats';
+import { Header } from '@/components/ui/header';
+import { Footer } from '@/components/ui/footer';
 
 interface DashboardStats {
   totalClients: number;
@@ -79,88 +74,39 @@ export const Dashboard = () => {
     }
   };
 
-  const getRoleBadge = (role: string) => {
-    const variants = {
-      admin: 'default',
-      subadmin: 'secondary',
-      client: 'outline',
-    } as const;
-    
-    return (
-      <Badge variant={variants[role as keyof typeof variants] || 'outline'}>
-        {role.charAt(0).toUpperCase() + role.slice(1)}
-      </Badge>
-    );
-  };
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0B0F1A]">
-        <LoadingSpinner size="xl" text="Loading cybersecurity dashboard..." />
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0F1A] grid-bg">
-      {/* Cybersecurity Header */}
-      <header className="bg-navy/90 backdrop-blur-md shadow-lg border-b border-cyan-500/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center terminal-glow">
-              <Terminal className="h-8 w-8 text-terminalGreen mr-3 animate-pulse" />
-              <Shield className="h-8 w-8 text-neonBlue mr-3" />
-              <h1 className="text-2xl font-mono font-bold text-neonBlue tracking-wider">
-                PRIMEBILL<span className="text-terminalGreen">_SYSTEMS</span>
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <NotificationCenter />
-              <div className="text-right">
-                <div className="text-sm text-gray-400 font-mono">AUTHENTICATED:</div>
-                <div className="font-medium text-cyan-400 flex items-center gap-2 font-mono">
-                  {user?.name || user?.email}
-                  {user?.role && getRoleBadge(user.role)}
-                </div>
-              </div>
-              <Button variant="outline" onClick={signOut} className="font-mono">
-                <LogOut className="h-4 w-4 mr-2" />
-                DISCONNECT
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header 
+        user={user}
+        onSignOut={signOut}
+        onProfileClick={() => {
+          // Handle profile click - could navigate to profile page
+        }}
+        onSettingsClick={() => {
+          // Handle settings click - could navigate to settings page
+        }}
+      />
 
-      {/* Terminal status bar */}
-      <div className="bg-black/40 border-b border-terminalGreen/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-2 text-xs font-mono">
-            <div className="flex items-center space-x-4">
-              <span className="text-terminalGreen">root@cybersec:~$</span>
-              <span className="text-cyan-400">Network Management Interface</span>
-              <div className="flex items-center space-x-2">
-                <Activity className="h-3 w-3 text-neonGreen animate-pulse" />
-                <span className="text-neonGreen">ONLINE</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-400">TLS 1.3</span>
-              <span className="text-neonBlue">ENCRYPTED</span>
-              <Network className="h-3 w-3 text-cyan-400" />
-            </div>
-          </div>
+      <main className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* User Role Check */}
+          {user?.role === 'client' ? (
+            <ClientDashboard />
+          ) : (
+            <AdminDashboard stats={stats} userRole={user?.role} />
+          )}
         </div>
-      </div>
+      </main>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* User Role Check */}
-        {user?.role === 'client' ? (
-          <ClientDashboard />
-        ) : (
-          <AdminDashboard stats={stats} userRole={user?.role} />
-        )}
-      </div>
+      <Footer />
     </div>
   );
 };
@@ -168,10 +114,23 @@ export const Dashboard = () => {
 const ClientDashboard = () => {
   return (
     <div className="animate-fade-in">
+      <div className="mb-8">
+        <h1 className="text-3xl font-heading font-bold text-gray-900 mb-2">
+          Dashboard
+        </h1>
+        <p className="text-gray-600">
+          Manage your internet subscription and account settings
+        </p>
+      </div>
+      
       <Tabs defaultValue="dashboard" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="dashboard" className="font-mono">DASHBOARD</TabsTrigger>
-          <TabsTrigger value="profile" className="font-mono">PROFILE</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-white shadow-soft border">
+          <TabsTrigger value="dashboard" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="profile" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Profile
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="dashboard">
@@ -188,21 +147,42 @@ const ClientDashboard = () => {
 
 const AdminDashboard = ({ stats, userRole }: { stats: DashboardStats; userRole?: string }) => {
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 animate-fade-in">
+      <div className="mb-8">
+        <h1 className="text-3xl font-heading font-bold text-gray-900 mb-2">
+          Admin Dashboard
+        </h1>
+        <p className="text-gray-600">
+          Manage users, plans, payments, and network infrastructure
+        </p>
+      </div>
+
       {/* Stats Grid - Now using the AdminStats component */}
       <AdminStats stats={stats} />
 
       {/* Management Tabs */}
       <Tabs defaultValue="clients" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="clients" className="font-mono">CLIENTS</TabsTrigger>
-          <TabsTrigger value="plans" className="font-mono">PLANS</TabsTrigger>
-          <TabsTrigger value="payments" className="font-mono">PAYMENTS</TabsTrigger>
-          {userRole === 'admin' && <TabsTrigger value="routers" className="font-mono">ROUTERS</TabsTrigger>}
+        <TabsList className={`grid w-full bg-white shadow-soft border ${
+          userRole === 'admin' ? 'grid-cols-4' : 'grid-cols-3'
+        }`}>
+          <TabsTrigger value="clients" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Clients
+          </TabsTrigger>
+          <TabsTrigger value="plans" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Plans
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Payments
+          </TabsTrigger>
+          {userRole === 'admin' && (
+            <TabsTrigger value="routers" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+              Routers
+            </TabsTrigger>
+          )}
         </TabsList>
         
         <TabsContent value="clients">
-          <ClientsManagement />
+          <ClientsManagementEnhanced />
         </TabsContent>
         
         <TabsContent value="plans">

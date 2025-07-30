@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { PaymentForm } from './PaymentForm';
 import { PaymentHistory } from './PaymentHistory';
 import UsageStatistics from './UsageStatistics';
-import PlanUpgrade from './PlanUpgrade';
+import PlanUpgradeEnhanced from './PlanUpgradeEnhanced';
 import { UserStats } from './dashboard/UserStats';
 import { PlanOverview } from './dashboard/PlanOverview';
 import { QuickActions } from './dashboard/QuickActions';
@@ -171,65 +171,80 @@ const UserDashboard = React.memo(() => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Welcome, {user?.name}</h1>
-            <p className="text-muted-foreground">Manage your internet subscription</p>
-          </div>
-          <Button onClick={refreshData} disabled={refreshing} variant="outline">
-            {refreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-heading font-bold text-gray-900">
+            Welcome, {user?.name}
+          </h2>
+          <p className="text-gray-600">Manage your internet subscription and account</p>
         </div>
-
-        {/* Alerts */}
-        <AlertsSection subscription={subscription} daysRemaining={daysRemaining} />
-
-        {/* Quick Stats */}
-        <UserStats subscription={subscription} daysRemaining={daysRemaining} />
-
-        {/* Main Content Tabs */}
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="usage">Usage</TabsTrigger>
-            <TabsTrigger value="plans">Plans</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <PlanOverview subscription={subscription} />
-              <QuickActions 
-                onRenewSubscription={handleRenewSubscription}
-                onUpgradePlan={handleUpgradePlan}
-                onManageAutoRenewal={handleManageAutoRenewal}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="usage">
-            <UsageStatistics />
-          </TabsContent>
-
-          <TabsContent value="plans">
-            <PlanUpgrade />
-          </TabsContent>
-
-          <TabsContent value="payments">
-            <div className="space-y-6">
-              <PaymentForm />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="history">
-            <PaymentHistory />
-          </TabsContent>
-        </Tabs>
+        <Button 
+          onClick={refreshData} 
+          disabled={refreshing} 
+          variant="outline"
+          className="bg-white hover:bg-isp-gray-50"
+        >
+          {refreshing ? 'Refreshing...' : 'Refresh'}
+        </Button>
       </div>
+
+      {/* Alerts */}
+      <AlertsSection subscription={subscription} daysRemaining={daysRemaining} />
+
+      {/* Quick Stats */}
+      <UserStats subscription={subscription} daysRemaining={daysRemaining} />
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5 bg-white shadow-soft border">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="usage" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Usage
+          </TabsTrigger>
+          <TabsTrigger value="plans" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Plans
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            Payments
+          </TabsTrigger>
+          <TabsTrigger value="history" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+            History
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <PlanOverview subscription={subscription} />
+            <QuickActions 
+              onRenewSubscription={handleRenewSubscription}
+              onUpgradePlan={handleUpgradePlan}
+              onManageAutoRenewal={handleManageAutoRenewal}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="usage">
+          <UsageStatistics />
+        </TabsContent>
+
+                 <TabsContent value="plans">
+           <PlanUpgradeEnhanced />
+         </TabsContent>
+
+        <TabsContent value="payments">
+          <div className="space-y-6">
+            <PaymentForm />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="history">
+          <PaymentHistory />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 });
