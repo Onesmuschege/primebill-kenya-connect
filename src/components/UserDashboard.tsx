@@ -324,15 +324,64 @@ const UserDashboard = () => {
                   <CardDescription>Manage your subscription</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full" size="sm">
+                  {/* Added onClick handlers to implement subscription renewal and upgrade flows */}
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    onClick={async () => {
+                      // Implement subscription renewal flow
+                      if (!subscription) {
+                        toast({
+                          title: "No active subscription",
+                          description: "You do not have an active subscription to renew.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      try {
+                        // Example: Call a supabase function or API to initiate renewal
+                        const { error } = await supabase.functions.invoke('subscription-renewal', {
+                          body: JSON.stringify({ subscriptionId: subscription.id }),
+                        });
+                        if (error) throw error;
+                        toast({
+                          title: "Renewal initiated",
+                          description: "Your subscription renewal has been initiated. Please check your email for confirmation.",
+                          variant: "default",
+                        });
+                      } catch (error) {
+                        toast({
+                          title: "Renewal failed",
+                          description: (error as Error).message || "Failed to initiate renewal.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
                     <CreditCard className="mr-2 h-4 w-4" />
                     Renew Subscription
                   </Button>
-                  <Button className="w-full" variant="outline" size="sm">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // TODO: Implement plan upgrade flow
+                      alert('Upgrade Plan flow to be implemented');
+                    }}
+                  >
                     <TrendingUp className="mr-2 h-4 w-4" />
                     Upgrade Plan
                   </Button>
-                  <Button className="w-full" variant="outline" size="sm">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // TODO: Implement auto-renewal management flow
+                      alert('Manage Auto-renewal flow to be implemented');
+                    }}
+                  >
                     <Settings className="mr-2 h-4 w-4" />
                     Manage Auto-renewal
                   </Button>
