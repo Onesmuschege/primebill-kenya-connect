@@ -11,6 +11,10 @@ import { UserStats } from './dashboard/UserStats';
 import { PlanOverview } from './dashboard/PlanOverview';
 import { QuickActions } from './dashboard/QuickActions';
 import { AlertsSection } from './dashboard/AlertsSection';
+import SupabaseTest from './SupabaseTest';
+import PlansTest from './PlansTest';
+import SupabaseClientTest from './SupabaseClientTest';
+import ReactQueryTest from './ReactQueryTest';
 
 interface Subscription {
   id: string;
@@ -232,8 +236,14 @@ const UserDashboard = React.memo(() => {
         </TabsContent>
 
                  <TabsContent value="plans">
-           <PlanUpgradeEnhanced />
-         </TabsContent>
+          <div className="space-y-6">
+            <SupabaseTest />
+            <SupabaseClientTest />
+            <ReactQueryTest />
+            <PlansTest />
+            <PlanUpgradeEnhanced />
+          </div>
+        </TabsContent>
 
         <TabsContent value="payments">
           <div className="space-y-6">

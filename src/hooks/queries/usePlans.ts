@@ -19,18 +19,60 @@ export const usePlans = (activeOnly: boolean = true) => {
   return useQuery({
     queryKey: ['plans', activeOnly],
     queryFn: async (): Promise<Plan[]> => {
+      console.log('🔍 Fetching plans from Supabase...');
+      console.log('📊 Active only:', activeOnly);
+      console.log('🔑 Supabase URL:', supabase.supabaseUrl);
+      console.log('🔑 Supabase Key length:', supabase.supabaseKey?.length || 0);
+      
       let query = supabase.from('plans').select('*').order('price_kes', { ascending: true });
       
       if (activeOnly) {
         query = query.eq('is_active', true);
       }
 
+      console.log('📡 Executing query...');
       const { data, error } = await query;
-      if (error) throw error;
+      
+      console.log('📡 Supabase response:', { 
+        data: data?.length || 0, 
+        error: error ? {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        } : null 
+      });
+      
+      if (error) {
+        console.error('❌ Error fetching plans:', error);
+        console.error('❌ Error details:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
+        throw error;
+      }
+      
+      console.log('✅ Plans fetched successfully:', data?.length, 'plans found');
+      if (data && data.length > 0) {
+        console.log('📋 Sample plans:', data.slice(0, 3).map(p => ({ name: p.name, price: p.price_kes })));
+      }
       return data || [];
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes
+    retry: (failureCount, error) => {
+      console.log(`🔄 Retry attempt ${failureCount + 1} for plans fetch`);
+      console.log(`🔄 Error on retry:`, error);
+      return failureCount < 3;
+    },
+    onError: (error) => {
+      console.error('💥 Plans query error:', error);
+    },
+    onSuccess: (data) => {
+      console.log('🎉 Plans query success:', data.length, 'plans loaded');
+    },
   });
 };
 
