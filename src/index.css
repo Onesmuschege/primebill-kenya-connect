@@ -1,4 +1,7 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
@@ -8,83 +11,87 @@
 
 @layer base {
   :root {
-    /* Professional ISP theme - clean and modern */
-    --background: 0 0% 100%; /* Clean white background */
-    --foreground: 222.2 84% 4.9%; /* Dark text */
-    --card: 0 0% 100%; /* White card background */
-    --card-foreground: 222.2 84% 4.9%;
+    /* Modern Tech + Kenyan Accent + Cybersecurity Theme */
+    --background: 0 0% 100%; /* White spacing base */
+    --foreground: 216 16% 12%; /* Charcoal Grey text */
+    --card: 210 40% 98%; /* Light Grey card background */
+    --card-foreground: 216 16% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 218 89% 34%; /* Deep ISP blue */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%; /* Light gray background */
-    --secondary-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 216 16% 12%;
+    --primary: 199 100% 36%; /* Ocean Blue primary */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%; /* Light Grey secondary */
+    --secondary-foreground: 216 16% 12%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 174 72% 56%; /* Teal accent */
+    --accent: 146 50% 36%; /* Forest Green accent */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%; /* Coral for destructive actions */
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 100% 64%; /* Alert Red for destructive actions */
+    --destructive-foreground: 0 0% 100%;
     --border: 214.3 31.8% 91.4%; /* Subtle gray border */
     --input: 214.3 31.8% 91.4%; /* Light input background */
-    --ring: 218 89% 34%; /* Deep blue focus ring */
+    --ring: 199 100% 36%; /* Ocean Blue focus ring */
     --radius: 0.75rem;
-    --chart-1: 218 89% 34%; /* Deep blue */
-    --chart-2: 174 72% 56%; /* Teal */
-    --chart-3: 0 84% 60%; /* Coral */
-    --chart-4: 220.9 39.3% 11%; /* Dark gray */
-    --chart-5: 215.4 16.3% 46.9%; /* Medium gray */
+    --chart-1: 199 100% 36%; /* Ocean Blue */
+    --chart-2: 146 50% 36%; /* Forest Green */
+    --chart-3: 40 71% 67%; /* Sand Gold */
+    --chart-4: 216 26% 18%; /* Cyber Navy */
+    --chart-5: 0 100% 64%; /* Alert Red */
     
-    /* Sidebar professional theme */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222.2 84% 4.9%;
-    --sidebar-primary: 218 89% 34%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 174 72% 56%;
+    /* Sidebar theme - Cyber Navy base */
+    --sidebar-background: 216 26% 18%; /* Cyber Navy */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 199 100% 36%; /* Ocean Blue */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 146 50% 36%; /* Forest Green */
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 214.3 31.8% 91.4%;
-    --sidebar-ring: 218 89% 34%;
+    --sidebar-border: 216 20% 25%;
+    --sidebar-ring: 199 100% 36%;
   }
 
   .dark {
-    /* Professional dark mode */
-    --background: 222.2 84% 4.9%; /* Very dark background */
+    /* Professional dark mode with Cyber Navy theme */
+    --background: 216 26% 18%; /* Cyber Navy background */
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 216 26% 18%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 216 26% 18%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%; /* Bright blue */
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 199 80% 50%; /* Brighter Ocean Blue */
+    --primary-foreground: 216 26% 18%;
+    --secondary: 216 20% 25%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 216 20% 25%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 174 72% 56%; /* Teal accent */
+    --accent: 146 50% 45%; /* Forest Green accent */
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 80% 50%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-    --chart-1: 217.2 91.2% 59.8%;
-    --chart-2: 174 72% 56%;
-    --chart-3: 0 84% 60%;
-    --chart-4: 217.2 32.6% 17.5%;
-    --chart-5: 215 20.2% 65.1%;
+    --border: 216 20% 25%;
+    --input: 216 20% 25%;
+    --ring: 199 80% 50%;
+    --chart-1: 199 80% 50%;
+    --chart-2: 146 50% 45%;
+    --chart-3: 40 71% 67%;
+    --chart-4: 216 20% 25%;
+    --chart-5: 0 80% 50%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-ocean-blue-200;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-white text-charcoal-grey-500 font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Subtle pattern for professional look */
-    background-image: radial-gradient(circle at 1px 1px, rgba(30, 64, 175, 0.05) 1px, transparent 0);
+    /* Tech-inspired subtle pattern */
+    background-image: radial-gradient(circle at 1px 1px, rgba(0, 119, 182, 0.03) 1px, transparent 0);
     background-size: 40px 40px;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
   }
 }
 
@@ -200,22 +207,34 @@
   }
 }
 
-/* Professional ISP utilities */
+/* Modern Tech + Kenyan + Cybersecurity utilities */
 @layer utilities {
   .glass-card {
-    @apply bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200/60 shadow-soft;
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-soft;
   }
   
   .professional-card {
-    @apply bg-card rounded-xl border shadow-card hover:shadow-card-hover transition-all duration-200;
+    @apply bg-card rounded-2xl border shadow-card hover:shadow-card-hover transition-all duration-200;
+  }
+  
+  .cyber-card {
+    @apply bg-cyber-navy-500/90 backdrop-blur-sm rounded-2xl border border-ocean-blue-400/20 shadow-cyber text-white;
   }
   
   .gradient-primary {
-    @apply bg-gradient-to-r from-isp-blue-600 to-isp-blue-700;
+    @apply bg-gradient-to-r from-ocean-blue-600 to-ocean-blue-700;
   }
   
   .gradient-accent {
-    @apply bg-gradient-to-r from-isp-teal-500 to-isp-teal-600;
+    @apply bg-gradient-to-r from-forest-green-500 to-forest-green-600;
+  }
+  
+  .gradient-cyber {
+    @apply bg-gradient-to-br from-cyber-navy-500 via-cyber-navy-600 to-ocean-blue-800;
+  }
+  
+  .gradient-kenyan {
+    @apply bg-gradient-to-r from-sand-gold-400 to-sand-gold-600;
   }
   
   .status-indicator {
@@ -223,7 +242,7 @@
   }
   
   .status-active {
-    @apply status-indicator bg-green-100 text-green-800;
+    @apply status-indicator bg-forest-green-100 text-forest-green-800;
   }
   
   .status-inactive {
@@ -231,11 +250,65 @@
   }
   
   .status-pending {
-    @apply status-indicator bg-yellow-100 text-yellow-800;
+    @apply status-indicator bg-sand-gold-100 text-sand-gold-800;
+  }
+  
+  .status-error {
+    @apply status-indicator bg-alert-red-100 text-alert-red-800;
   }
   
   .section-divider {
     @apply border-t border-gray-200 pt-6 mt-6;
+  }
+  
+  .tech-glow {
+    @apply shadow-glow animate-glow-pulse;
+  }
+  
+  .cyber-border {
+    @apply border border-ocean-blue-400/30 shadow-cyber;
+  }
+  
+  .kenyan-accent {
+    @apply border-l-4 border-sand-gold-500 bg-sand-gold-50/50;
+  }
+  
+  .btn-primary {
+    @apply bg-ocean-blue-500 hover:bg-forest-green-500 text-white rounded-lg transition-all duration-200 ease-in-out shadow-md hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply bg-light-grey-500 hover:bg-sand-gold-100 text-charcoal-grey-500 rounded-lg transition-all duration-200 ease-in-out;
+  }
+  
+  .navbar-cyber {
+    @apply bg-cyber-navy-500 text-white shadow-cyber;
+  }
+  
+  .footer-cyber {
+    @apply bg-cyber-navy-500 text-white border-t border-ocean-blue-400/20;
+  }
+  
+  /* Mobile-specific improvements */
+  .mobile-touch {
+    @apply min-h-[44px] min-w-[44px]; /* Minimum touch target size */
+  }
+  
+  .mobile-nav {
+    @apply sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-cyber-navy-500 border-t border-ocean-blue-400/20;
+  }
+  
+  /* Animation delays for staggered effects */
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  
+  .animation-delay-700 {
+    animation-delay: 700ms;
+  }
+  
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
   }
 }
 

@@ -9,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl bg-white/5 backdrop-blur-sm text-card-foreground shadow-lg border border-cyan-500/20 hover:ring-1 hover:ring-cyan-400/40 transition-all duration-300",
+      "rounded-2xl bg-white border border-ocean-blue-100 shadow-card hover:shadow-card-hover transition-all duration-200 ease-in-out",
       className
     )}
     {...props}
@@ -36,7 +36,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight text-cyan-400",
+      "text-xl font-heading font-semibold leading-none tracking-tight text-charcoal-grey-500",
       className
     )}
     {...props}
@@ -50,7 +50,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-gray-300", className)}
+    className={cn("text-sm text-charcoal-grey-400 leading-relaxed", className)}
     {...props}
   />
 ))
@@ -76,4 +76,44 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+// Additional card variants for the theme
+const KenyanCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-2xl bg-sand-gold-50 border border-sand-gold-200 shadow-card hover:shadow-card-hover transition-all duration-200 kenyan-accent",
+      className
+    )}
+    {...props}
+  />
+))
+KenyanCard.displayName = "KenyanCard"
+
+const CyberCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-2xl bg-cyber-navy-500/90 backdrop-blur-sm border border-ocean-blue-400/20 shadow-cyber text-white",
+      className
+    )}
+    {...props}
+  />
+))
+CyberCard.displayName = "CyberCard"
+
+export { 
+  Card, 
+  CardHeader, 
+  CardFooter, 
+  CardTitle, 
+  CardDescription, 
+  CardContent,
+  KenyanCard,
+  CyberCard 
+}
