@@ -32,22 +32,68 @@ const PlanUpgradeEnhanced = () => {
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Test Supabase connection on mount
+  useEffect(() => {
+    const testConnection = async () => {
+      console.log('🔌 Testing Supabase connection...');
+      
+      try {
+        // Test basic connection
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log('👤 Auth status:', user ? 'Authenticated' : 'Not authenticated');
+        console.log('👤 User:', user);
+        
+        // Test database connection
+        const { data, error } = await supabase
+          .from('plans')
+          .select('count')
+          .limit(1);
+        
+        console.log('📊 Database connection test:', { data, error });
+        
+        if (error) {
+          console.error('❌ Database connection failed:', error);
+        } else {
+          console.log('✅ Database connection successful');
+        }
+      } catch (error) {
+        console.error('💥 Connection test failed:', error);
+      }
+    };
+    
+    testConnection();
+  }, []);
+
   const fetchData = async () => {
     try {
       setLoading(true);
+      console.log('🔍 PlanUpgradeEnhanced: Starting to fetch data...');
 
       // Fetch available plans
+      console.log('📊 Fetching plans from Supabase...');
       const { data: plansData, error: plansError } = await supabase
         .from('plans')
         .select('*')
         .eq('is_active', true)
         .order('price_kes', { ascending: true });
 
-      if (plansError) throw plansError;
+      console.log('📡 Plans response:', { plansData, plansError });
+
+      if (plansError) {
+        console.error('❌ Plans fetch error:', plansError);
+        throw plansError;
+      }
+
+      console.log('✅ Plans fetched successfully:', plansData?.length, 'plans found');
 
       // Fetch current subscription
+      console.log('👤 Fetching current user...');
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (user) {
+        console.log('👤 User found:', user.id);
+        console.log('📊 Fetching current subscription...');
+        
         const { data: subscription, error: subError } = await supabase
           .from('subscriptions')
           .select(`
@@ -60,11 +106,17 @@ const PlanUpgradeEnhanced = () => {
           .limit(1)
           .single();
 
+        console.log('📡 Subscription response:', { subscription, subError });
+
         if (subError && subError.code !== 'PGRST116') {
+          console.error('❌ Subscription fetch error:', subError);
           throw subError;
         }
 
         setCurrentSubscription(subscription);
+        console.log('✅ Current subscription set:', subscription);
+      } else {
+        console.log('⚠️ No user found');
       }
 
       // Add sample features for better UX
@@ -75,9 +127,10 @@ const PlanUpgradeEnhanced = () => {
         current: subscription?.plan_id === plan.id
       })) || [];
 
+      console.log('🎨 Enhanced plans created:', enhancedPlans.length, 'plans');
       setPlans(enhancedPlans);
     } catch (error) {
-      console.error('Error fetching plans:', error);
+      console.error('💥 Error in fetchData:', error);
       toast({
         title: "Error",
         description: "Failed to fetch plans",
@@ -85,6 +138,7 @@ const PlanUpgradeEnhanced = () => {
       });
     } finally {
       setLoading(false);
+      console.log('🏁 fetchData completed');
     }
   };
 

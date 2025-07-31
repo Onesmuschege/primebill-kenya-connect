@@ -11,82 +11,82 @@
 
 @layer base {
   :root {
-    /* Modern Tech + Kenyan Accent + Cybersecurity Theme */
-    --background: 0 0% 100%; /* White spacing base */
-    --foreground: 216 16% 12%; /* Charcoal Grey text */
-    --card: 210 40% 98%; /* Light Grey card background */
-    --card-foreground: 216 16% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 216 16% 12%;
-    --primary: 199 100% 36%; /* Ocean Blue primary */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%; /* Light Grey secondary */
-    --secondary-foreground: 216 16% 12%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 146 50% 36%; /* Forest Green accent */
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 100% 64%; /* Alert Red for destructive actions */
-    --destructive-foreground: 0 0% 100%;
-    --border: 214.3 31.8% 91.4%; /* Subtle gray border */
-    --input: 214.3 31.8% 91.4%; /* Light input background */
-    --ring: 199 100% 36%; /* Ocean Blue focus ring */
+    /* Improved Color Palette - Gunmetal Navy Theme */
+    --background: 222 84% 5%; /* #0F172A - Gunmetal Navy */
+    --foreground: 210 40% 98%; /* #F1F5F9 - Text Primary */
+    --card: 217 33% 17%; /* #1E293B - Dark Slate */
+    --card-foreground: 210 40% 98%;
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%; /* #3B82F6 - Blue-500 */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 148 16% 47%; /* #94A3B8 - Text Secondary */
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%; /* #EF4444 - Red-500 */
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
     --radius: 0.75rem;
-    --chart-1: 199 100% 36%; /* Ocean Blue */
+    --chart-1: 217 91% 60%; /* Blue-500 */
     --chart-2: 146 50% 36%; /* Forest Green */
     --chart-3: 40 71% 67%; /* Sand Gold */
-    --chart-4: 216 26% 18%; /* Cyber Navy */
-    --chart-5: 0 100% 64%; /* Alert Red */
+    --chart-4: 222 84% 5%; /* Gunmetal Navy */
+    --chart-5: 0 84% 60%; /* Red-500 */
     
-    /* Sidebar theme - Cyber Navy base */
-    --sidebar-background: 216 26% 18%; /* Cyber Navy */
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 199 100% 36%; /* Ocean Blue */
-    --sidebar-primary-foreground: 0 0% 100%;
+    /* Sidebar theme - Gunmetal Navy base */
+    --sidebar-background: 222 84% 5%; /* Gunmetal Navy */
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%; /* Blue-500 */
+    --sidebar-primary-foreground: 210 40% 98%;
     --sidebar-accent: 146 50% 36%; /* Forest Green */
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 216 20% 25%;
-    --sidebar-ring: 199 100% 36%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .dark {
-    /* Professional dark mode with Cyber Navy theme */
-    --background: 216 26% 18%; /* Cyber Navy background */
+    /* Professional dark mode with Gunmetal Navy theme */
+    --background: 222 84% 5%; /* Gunmetal Navy background */
     --foreground: 210 40% 98%;
-    --card: 216 26% 18%;
+    --card: 217 33% 17%; /* Dark Slate */
     --card-foreground: 210 40% 98%;
-    --popover: 216 26% 18%;
+    --popover: 217 33% 17%;
     --popover-foreground: 210 40% 98%;
-    --primary: 199 80% 50%; /* Brighter Ocean Blue */
-    --primary-foreground: 216 26% 18%;
-    --secondary: 216 20% 25%;
+    --primary: 217 91% 60%; /* Blue-500 */
+    --primary-foreground: 222 84% 5%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 216 20% 25%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 148 16% 47%; /* #94A3B8 - Text Secondary */
     --accent: 146 50% 45%; /* Forest Green accent */
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 80% 50%;
+    --destructive: 0 84% 60%; /* #EF4444 - Red-500 */
     --destructive-foreground: 210 40% 98%;
-    --border: 216 20% 25%;
-    --input: 216 20% 25%;
-    --ring: 199 80% 50%;
-    --chart-1: 199 80% 50%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
+    --chart-1: 217 91% 60%;
     --chart-2: 146 50% 45%;
     --chart-3: 40 71% 67%;
-    --chart-4: 216 20% 25%;
-    --chart-5: 0 80% 50%;
+    --chart-4: 217 33% 17%;
+    --chart-5: 0 84% 60%;
   }
 }
 
 @layer base {
   * {
-    @apply border-ocean-blue-200;
+    @apply border-border;
   }
   body {
-    @apply bg-white text-charcoal-grey-500 font-sans;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
     /* Tech-inspired subtle pattern */
-    background-image: radial-gradient(circle at 1px 1px, rgba(0, 119, 182, 0.03) 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.03) 1px, transparent 0);
     background-size: 40px 40px;
   }
   
@@ -207,10 +207,10 @@
   }
 }
 
-/* Modern Tech + Kenyan + Cybersecurity utilities */
+/* Improved Color Palette Utilities */
 @layer utilities {
   .glass-card {
-    @apply bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-soft;
+    @apply bg-card/80 backdrop-blur-sm rounded-2xl border border-border/60 shadow-soft;
   }
   
   .professional-card {
@@ -218,23 +218,23 @@
   }
   
   .cyber-card {
-    @apply bg-cyber-navy-500/90 backdrop-blur-sm rounded-2xl border border-ocean-blue-400/20 shadow-cyber text-white;
+    @apply bg-background/90 backdrop-blur-sm rounded-2xl border border-primary/20 shadow-cyber text-foreground;
   }
   
   .gradient-primary {
-    @apply bg-gradient-to-r from-ocean-blue-600 to-ocean-blue-700;
+    @apply bg-gradient-to-r from-blue-600 to-blue-700;
   }
   
   .gradient-accent {
-    @apply bg-gradient-to-r from-forest-green-500 to-forest-green-600;
+    @apply bg-gradient-to-r from-green-500 to-green-600;
   }
   
   .gradient-cyber {
-    @apply bg-gradient-to-br from-cyber-navy-500 via-cyber-navy-600 to-ocean-blue-800;
+    @apply bg-gradient-to-br from-slate-800 via-slate-700 to-blue-800;
   }
   
   .gradient-kenyan {
-    @apply bg-gradient-to-r from-sand-gold-400 to-sand-gold-600;
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-600;
   }
   
   .status-indicator {
@@ -242,7 +242,7 @@
   }
   
   .status-active {
-    @apply status-indicator bg-forest-green-100 text-forest-green-800;
+    @apply status-indicator bg-green-100 text-green-800;
   }
   
   .status-inactive {
@@ -250,15 +250,15 @@
   }
   
   .status-pending {
-    @apply status-indicator bg-sand-gold-100 text-sand-gold-800;
+    @apply status-indicator bg-yellow-100 text-yellow-800;
   }
   
   .status-error {
-    @apply status-indicator bg-alert-red-100 text-alert-red-800;
+    @apply status-indicator bg-red-100 text-red-800;
   }
   
   .section-divider {
-    @apply border-t border-gray-200 pt-6 mt-6;
+    @apply border-t border-border pt-6 mt-6;
   }
   
   .tech-glow {
@@ -266,27 +266,27 @@
   }
   
   .cyber-border {
-    @apply border border-ocean-blue-400/30 shadow-cyber;
+    @apply border border-primary/30 shadow-cyber;
   }
   
   .kenyan-accent {
-    @apply border-l-4 border-sand-gold-500 bg-sand-gold-50/50;
+    @apply border-l-4 border-yellow-500 bg-yellow-50/50;
   }
   
   .btn-primary {
-    @apply bg-ocean-blue-500 hover:bg-forest-green-500 text-white rounded-lg transition-all duration-200 ease-in-out shadow-md hover:shadow-lg;
+    @apply bg-primary hover:bg-blue-600 text-primary-foreground rounded-lg transition-all duration-200 ease-in-out shadow-md hover:shadow-lg;
   }
   
   .btn-secondary {
-    @apply bg-light-grey-500 hover:bg-sand-gold-100 text-charcoal-grey-500 rounded-lg transition-all duration-200 ease-in-out;
+    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg transition-all duration-200 ease-in-out;
   }
   
   .navbar-cyber {
-    @apply bg-cyber-navy-500 text-white shadow-cyber;
+    @apply bg-background text-foreground shadow-cyber;
   }
   
   .footer-cyber {
-    @apply bg-cyber-navy-500 text-white border-t border-ocean-blue-400/20;
+    @apply bg-background text-foreground border-t border-border;
   }
   
   /* Mobile-specific improvements */
