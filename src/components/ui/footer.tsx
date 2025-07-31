@@ -8,7 +8,9 @@ import {
   Twitter, 
   Linkedin, 
   Instagram,
-  ExternalLink
+  ExternalLink,
+  Shield,
+  Globe
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
@@ -18,7 +20,7 @@ export const Footer: React.FC = () => {
     { name: 'Help Center', href: '/help' },
     { name: 'Contact Support', href: '/support' },
     { name: 'Network Status', href: '/status' },
-    { name: 'Service Areas', href: '/coverage' },
+    { name: 'Service Coverage', href: '/coverage' },
   ];
 
   const companyLinks = [
@@ -32,58 +34,71 @@ export const Footer: React.FC = () => {
     { name: 'Privacy Policy', href: '/privacy' },
     { name: 'Terms of Service', href: '/terms' },
     { name: 'Service Agreement', href: '/agreement' },
-    { name: 'Acceptable Use', href: '/acceptable-use' },
+    { name: 'Data Protection', href: '/data-protection' },
   ];
 
   const socialLinks = [
-    { name: 'Facebook', icon: Facebook, href: 'https://facebook.com' },
-    { name: 'Twitter', icon: Twitter, href: 'https://twitter.com' },
-    { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com' },
-    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com' },
+    { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/primebillkenya' },
+    { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/primebillkenya' },
+    { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/primebill-kenya' },
+    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/primebillkenya' },
   ];
 
   return (
-    <footer className="bg-isp-gray-50 border-t border-gray-200">
+    <footer className="footer-cyber">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Information */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-heading font-bold text-isp-blue-700 mb-4">
-                PrimeBill ISP
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Reliable internet service provider delivering high-speed connectivity 
-                and exceptional customer service across Kenya.
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-br from-ocean-blue-500 to-ocean-blue-600 rounded-lg flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-white">
+                  PrimeBill Kenya
+                </h3>
+              </div>
+              <p className="text-sm text-ocean-blue-200 mb-4 leading-relaxed">
+                Kenya's leading cybersecurity-focused ISP delivering ultra-fast, 
+                secure internet connectivity with 24/7 support across major cities.
               </p>
             </div>
             
             {/* Contact Information */}
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <Phone className="h-4 w-4 text-isp-blue-600" />
-                <span>+254 700 123 456</span>
+              <div className="flex items-center space-x-3 text-sm text-ocean-blue-100">
+                <Phone className="h-4 w-4 text-ocean-blue-400" />
+                <span>+254 700 PRIME (77463)</span>
               </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <Mail className="h-4 w-4 text-isp-blue-600" />
+              <div className="flex items-center space-x-3 text-sm text-ocean-blue-100">
+                <Mail className="h-4 w-4 text-ocean-blue-400" />
                 <span>support@primebill.co.ke</span>
               </div>
-              <div className="flex items-start space-x-3 text-sm text-gray-600">
-                <MapPin className="h-4 w-4 text-isp-blue-600 mt-0.5" />
-                <span>Nairobi, Kenya<br />Business Center, 5th Floor</span>
+              <div className="flex items-start space-x-3 text-sm text-ocean-blue-100">
+                <MapPin className="h-4 w-4 text-ocean-blue-400 mt-0.5" />
+                <span>
+                  Westlands, Nairobi<br />
+                  ABC Place, 6th Floor<br />
+                  Waiyaki Way
+                </span>
+              </div>
+              <div className="flex items-center space-x-3 text-sm text-ocean-blue-100">
+                <Globe className="h-4 w-4 text-ocean-blue-400" />
+                <span>Available 24/7 Support</span>
               </div>
             </div>
           </div>
 
           {/* Support Links */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Support</h4>
+            <h4 className="text-sm font-semibold text-white mb-4 font-heading">Support</h4>
             <ul className="space-y-3">
               {supportLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-isp-blue-600 transition-colors duration-200 flex items-center group"
+                    className="text-sm text-ocean-blue-200 hover:text-white transition-colors duration-200 flex items-center group"
                   >
                     {link.name}
                     <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -95,13 +110,13 @@ export const Footer: React.FC = () => {
 
           {/* Company Links */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Company</h4>
+            <h4 className="text-sm font-semibold text-white mb-4 font-heading">Company</h4>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-isp-blue-600 transition-colors duration-200 flex items-center group"
+                    className="text-sm text-ocean-blue-200 hover:text-white transition-colors duration-200 flex items-center group"
                   >
                     {link.name}
                     <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -113,13 +128,13 @@ export const Footer: React.FC = () => {
 
           {/* Legal & Social */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Legal</h4>
+            <h4 className="text-sm font-semibold text-white mb-4 font-heading">Legal & Connect</h4>
             <ul className="space-y-3 mb-6">
               {legalLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-isp-blue-600 transition-colors duration-200"
+                    className="text-sm text-ocean-blue-200 hover:text-white transition-colors duration-200"
                   >
                     {link.name}
                   </a>
@@ -129,14 +144,14 @@ export const Footer: React.FC = () => {
 
             {/* Social Media Links */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">Follow Us</h4>
+              <h4 className="text-sm font-semibold text-white mb-4 font-heading">Follow Us</h4>
               <div className="flex space-x-3">
                 {socialLinks.map((social) => (
                   <Button
                     key={social.name}
                     variant="ghost"
                     size="sm"
-                    className="p-2 text-gray-600 hover:text-isp-blue-600 hover:bg-isp-blue-50"
+                    className="p-2 text-ocean-blue-200 hover:text-white hover:bg-ocean-blue-500/20 rounded-lg transition-all duration-200"
                     asChild
                   >
                     <a 
@@ -155,15 +170,20 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
+        <div className="mt-12 pt-8 border-t border-ocean-blue-400/20">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-            <div className="text-sm text-gray-600">
-              © {currentYear} PrimeBill ISP. All rights reserved.
+            <div className="text-sm text-ocean-blue-200">
+              © {currentYear} PrimeBill Kenya Ltd. All rights reserved.
             </div>
-            <div className="flex items-center space-x-6 text-sm text-gray-600">
-              <span>Licensed by Communications Authority of Kenya</span>
+            <div className="flex items-center space-x-6 text-sm text-ocean-blue-200">
+              <span className="flex items-center space-x-1">
+                <Shield className="h-3 w-3" />
+                <span>CA Licensed</span>
+              </span>
               <span>•</span>
-              <span>ISO 9001:2015 Certified</span>
+              <span>ISO 27001 Certified</span>
+              <span>•</span>
+              <span>Kenyan Owned</span>
             </div>
           </div>
         </div>

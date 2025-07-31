@@ -15,7 +15,7 @@ import {
   User, 
   Settings, 
   HelpCircle,
-  Wifi,
+  Shield,
   ChevronDown
 } from 'lucide-react';
 
@@ -40,9 +40,9 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const getRoleBadge = (role: string) => {
     const variants = {
-      admin: 'bg-isp-blue-100 text-isp-blue-800',
-      subadmin: 'bg-isp-teal-100 text-isp-teal-800',
-      client: 'bg-isp-gray-100 text-isp-gray-800',
+      admin: 'bg-ocean-blue-100 text-ocean-blue-800 border border-ocean-blue-200',
+      subadmin: 'bg-forest-green-100 text-forest-green-800 border border-forest-green-200',
+      client: 'bg-sand-gold-100 text-sand-gold-800 border border-sand-gold-200',
     } as const;
     
     return (
@@ -62,21 +62,21 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-soft">
+    <header className="navbar-cyber shadow-cyber border-b border-ocean-blue-400/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Branding */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <Wifi className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-br from-ocean-blue-500 to-ocean-blue-600 rounded-lg flex items-center justify-center shadow-glow">
+                <Shield className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-heading font-bold text-isp-blue-700">
-                  PrimeBill ISP
+                <h1 className="text-xl font-heading font-bold text-white">
+                  PrimeBill Kenya
                 </h1>
-                <p className="text-xs text-isp-gray-500 font-medium">
-                  Network Management
+                <p className="text-xs text-ocean-blue-200 font-medium">
+                  Secure Network Solutions
                 </p>
               </div>
             </div>
@@ -86,57 +86,67 @@ export const Header: React.FC<HeaderProps> = ({
           {user && (
             <div className="flex items-center space-x-4">
               {/* Help Icon */}
-              <Button variant="ghost" size="sm" className="text-isp-gray-500 hover:text-isp-blue-600">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-ocean-blue-200 hover:text-white hover:bg-ocean-blue-500/20 transition-all duration-200"
+              >
                 <HelpCircle className="h-5 w-5" />
               </Button>
 
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-3 hover:bg-isp-gray-50 rounded-lg px-3 py-2">
-                    <Avatar className="h-8 w-8">
+                  <Button 
+                    variant="ghost" 
+                    className="flex items-center space-x-3 hover:bg-ocean-blue-500/20 rounded-lg px-3 py-2 text-white transition-all duration-200"
+                  >
+                    <Avatar className="h-8 w-8 border-2 border-ocean-blue-400/30">
                       <AvatarImage src={user.avatar_url} alt={user.name} />
-                      <AvatarFallback className="bg-isp-blue-100 text-isp-blue-700 text-sm font-medium">
+                      <AvatarFallback className="bg-ocean-blue-100 text-ocean-blue-700 text-sm font-medium">
                         {getInitials(user.name || user.email)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="text-left hidden sm:block">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-white">
                         {user.name || user.email.split('@')[0]}
                       </div>
-                      <div className="text-xs text-gray-500">{user.email}</div>
+                      <div className="text-xs text-ocean-blue-200">{user.email}</div>
                     </div>
                     <div className="flex items-center space-x-2">
                       {getRoleBadge(user.role)}
-                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                      <ChevronDown className="h-4 w-4 text-ocean-blue-200" />
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-56 bg-white border border-ocean-blue-200 shadow-cyber rounded-lg"
+                >
+                  <DropdownMenuLabel className="text-charcoal-grey-500">My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-ocean-blue-100" />
                   
                   <DropdownMenuItem 
                     onClick={onProfileClick}
-                    className="cursor-pointer"
+                    className="cursor-pointer hover:bg-ocean-blue-50 transition-colors"
                   >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+                    <User className="mr-2 h-4 w-4 text-ocean-blue-600" />
+                    <span className="text-charcoal-grey-500">Profile</span>
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem 
                     onClick={onSettingsClick}
-                    className="cursor-pointer"
+                    className="cursor-pointer hover:bg-ocean-blue-50 transition-colors"
                   >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <Settings className="mr-2 h-4 w-4 text-ocean-blue-600" />
+                    <span className="text-charcoal-grey-500">Settings</span>
                   </DropdownMenuItem>
                   
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-ocean-blue-100" />
                   
                   <DropdownMenuItem 
                     onClick={onSignOut}
-                    className="cursor-pointer text-red-600 focus:text-red-600"
+                    className="cursor-pointer text-alert-red-600 focus:text-alert-red-600 hover:bg-alert-red-50 transition-colors"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
