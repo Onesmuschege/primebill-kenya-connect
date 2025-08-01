@@ -220,7 +220,7 @@
   }
   
   .cyber-card {
-    @apply bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-cyber-blue/20 shadow-cyber text-foreground;
+    @apply bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-cyber-blue-500/20 shadow-cyber text-foreground;
   }
   
   .gradient-primary {
@@ -268,7 +268,7 @@
   }
   
   .cyber-border {
-    @apply border border-cyber-blue/30 shadow-cyber;
+    @apply border border-cyber-blue-500/30 shadow-cyber;
   }
   
   .cyber-accent {
@@ -303,6 +303,37 @@
   .mobile-nav {
     @apply sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-cyber-black-500 border-t border-cyber-blue-400/20;
   }
+
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+  }
+
+  /* Enhanced touch interactions */
+  .touch-feedback {
+    @apply active:scale-95 transition-transform duration-150;
+  }
+
+  /* Improved card hover states for mobile */
+  @media (hover: hover) {
+    .cyber-card-hover:hover {
+      @apply shadow-cyber-glow border-cyber-purple-500/50 transition-all duration-300;
+    }
+  }
+  
+  /* Safe area handling for mobile devices */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
   
   /* Animation delays for staggered effects */
   .animation-delay-300 {
@@ -323,7 +354,7 @@
   }
   
   .cyber-border-glow {
-    @apply border border-cyber-blue/50 shadow-[0_0_20px_rgba(14,165,233,0.2)];
+    @apply border border-cyber-blue-500/50 shadow-[0_0_20px_rgba(14,165,233,0.2)];
   }
   
   .cyber-bg-gradient {
@@ -331,7 +362,7 @@
   }
   
   .cyber-card-hover {
-    @apply hover:shadow-cyber-glow hover:border-cyber-purple/50 transition-all duration-300;
+    @apply hover:shadow-cyber-glow hover:border-cyber-purple-500/50 transition-all duration-300;
   }
 }
 
