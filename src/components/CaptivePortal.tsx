@@ -41,7 +41,7 @@ interface UserSession {
 export const CaptivePortal = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<unknown>(null);
   const [userSession, setUserSession] = useState<UserSession | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
@@ -82,7 +82,7 @@ export const CaptivePortal = () => {
 
       if (error) throw error;
       setPlans(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching plans:', error);
     }
   };
@@ -110,7 +110,7 @@ export const CaptivePortal = () => {
         setUserSession(session);
         setCurrentUser(session.users);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error checking session:', error);
     }
   };
@@ -159,7 +159,7 @@ export const CaptivePortal = () => {
         description: "Logged in successfully",
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: error.message || "Login failed",
@@ -213,7 +213,7 @@ export const CaptivePortal = () => {
 
       setCurrentUser(data.user);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: error.message || "Registration failed",
@@ -515,7 +515,7 @@ export const CaptivePortal = () => {
           
           <div className="mt-6 text-center text-sm text-gray-600">
             <p>Need help? Contact support at:</p>
-            <p>📞 +254700000000 | 📧 support@primebill.co.ke</p>
+            <p>📞 +254700000000 | support@primebill.co.ke</p>
           </div>
         </CardContent>
       </Card>
