@@ -19,6 +19,7 @@ export default {
 		},
 		extend: {
 			colors: {
+
 				// Modern Cyberpunk Tech Theme Colors
 				'cyber-blue': {
 					50: '#e0f7ff',
@@ -31,6 +32,100 @@ export default {
 					700: '#0a83c3',
 					800: '#0872b0',
 					900: '#06619d',
+=======
+				// Modern Cybersecurity & Tech Theme Colors
+				'electric-blue': {
+					50: '#f0f9ff',
+					100: '#e0f2fe',
+					200: '#bae6fd',
+					300: '#7dd3fc',
+					400: '#38bdf8',
+					500: '#0ea5e9', // Primary Electric Blue
+					600: '#0284c7',
+					700: '#0369a1',
+					800: '#075985',
+					900: '#0c4a6e',
+					950: '#082f49',
+				},
+				'neon-green': {
+					50: '#f0fdf4',
+					100: '#dcfce7',
+					200: '#bbf7d0',
+					300: '#86efac',
+					400: '#4ade80',
+					500: '#10b981', // Neon Tech Green
+					600: '#059669',
+					700: '#047857',
+					800: '#065f46',
+					900: '#064e3b',
+					950: '#022c22',
+				},
+				'cyber-purple': {
+					50: '#faf5ff',
+					100: '#f3e8ff',
+					200: '#e9d5ff',
+					300: '#d8b4fe',
+					400: '#c084fc',
+					500: '#a855f7', // Electric Purple
+					600: '#9333ea',
+					700: '#7c3aed',
+					800: '#6b21a8',
+					900: '#581c87',
+					950: '#3b0764',
+				},
+				'tech-gold': {
+					50: '#fffbeb',
+					100: '#fef3c7',
+					200: '#fde68a',
+					300: '#fcd34d',
+					400: '#fbbf24',
+					500: '#f59e0b', // Cyber Gold
+					600: '#d97706',
+					700: '#b45309',
+					800: '#92400e',
+					900: '#78350f',
+					950: '#451a03',
+				},
+				'deep-navy': {
+					50: '#f8fafc',
+					100: '#f1f5f9',
+					200: '#e2e8f0',
+					300: '#cbd5e1',
+					400: '#94a3b8',
+					500: '#64748b',
+					600: '#475569',
+					700: '#334155',
+					800: '#1e293b',
+					900: '#0f172a', // Deep Tech Navy
+					950: '#020617',
+				},
+				'matrix-green': {
+					50: '#f0fdf4',
+					100: '#dcfce7',
+					200: '#bbf7d0',
+					300: '#86efac',
+					400: '#4ade80',
+					500: '#22c55e',
+					600: '#16a34a', // Matrix Green
+					700: '#15803d',
+					800: '#166534',
+					900: '#14532d',
+					950: '#052e16',
+				},
+				
+				// Professional ISP theme colors (preserved for compatibility)
+				'ocean-blue': {
+					50: '#e6f4ff',
+					100: '#bae0ff',
+					200: '#91ccff',
+					300: '#69b8ff',
+					400: '#40a4ff',
+					500: '#0077B6', // Primary Ocean Blue
+					600: '#006ba3',
+					700: '#005c8f',
+					800: '#004d7a',
+					900: '#003d66',
+
 				},
 				'cyber-purple': {
 					50: '#f3e8ff',
@@ -105,7 +200,7 @@ export default {
 					900: '#7f1d1d',
 				},
 				
-				// Professional ISP theme colors (preserved for compatibility)
+				// Enhanced ISP colors
 				'isp-blue': {
 					50: '#eff6ff',
 					100: '#dbeafe',
@@ -131,35 +226,12 @@ export default {
 					800: '#115e59',
 					900: '#134e4a',
 				},
-				'isp-coral': {
-					50: '#fef2f2',
-					100: '#fee2e2',
-					200: '#fecaca',
-					300: '#fca5a5',
-					400: '#f87171',
-					500: '#ef4444', // Coral accent
-					600: '#dc2626',
-					700: '#b91c1c',
-					800: '#991b1b',
-					900: '#7f1d1d',
-				},
-				'isp-gray': {
-					50: '#f8fafc',
-					100: '#f1f5f9',
-					200: '#e2e8f0',
-					300: '#cbd5e1',
-					400: '#94a3b8',
-					500: '#64748b', // Light gray
-					600: '#475569',
-					700: '#334155',
-					800: '#1e293b',
-					900: '#0f172a',
-				},
 				
 				// Existing shadcn colors (preserved for compatibility)
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
+				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
@@ -201,10 +273,11 @@ export default {
 				}
 			},
 			fontFamily: {
-				sans: ['Poppins', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-				mono: ['IBM Plex Mono', 'ui-monospace', 'monospace'],
-				heading: ['DM Sans', 'Poppins', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				sans: ['Inter', 'Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				mono: ['JetBrains Mono', 'IBM Plex Mono', 'ui-monospace', 'monospace'],
+				heading: ['DM Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
 				display: ['Manrope', 'DM Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				tech: ['Orbitron', 'JetBrains Mono', 'monospace'],
 			},
 			boxShadow: {
 				'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
@@ -215,6 +288,12 @@ export default {
 				'cyber': '0 4px 20px rgba(10, 13, 20, 0.3), 0 2px 10px rgba(14, 165, 233, 0.1)',
 				'glow': '0 0 20px rgba(14, 165, 233, 0.3), 0 0 40px rgba(14, 165, 233, 0.1)',
 				'cyber-glow': '0 0 30px rgba(139, 92, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.2)',
+				'cyber': '0 4px 20px rgba(10, 25, 47, 0.4), 0 2px 10px rgba(14, 165, 233, 0.15)',
+				'tech': '0 8px 32px rgba(14, 165, 233, 0.12), 0 4px 16px rgba(16, 185, 129, 0.08)',
+				'glow': '0 0 20px rgba(14, 165, 233, 0.3), 0 0 40px rgba(14, 165, 233, 0.1)',
+				'electric': '0 0 10px rgba(14, 165, 233, 0.4), 0 0 20px rgba(14, 165, 233, 0.2), 0 0 30px rgba(14, 165, 233, 0.1)',
+				'neon': '0 0 10px rgba(16, 185, 129, 0.4), 0 0 20px rgba(16, 185, 129, 0.2), 0 0 30px rgba(16, 185, 129, 0.1)',
+				'cyber-glow': '0 0 15px rgba(168, 85, 247, 0.3), 0 0 30px rgba(168, 85, 247, 0.15)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -222,6 +301,7 @@ export default {
 				sm: 'calc(var(--radius) - 4px)',
 				'2xl': '1rem',
 				'3xl': '1.5rem',
+				'4xl': '2rem',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -263,6 +343,38 @@ export default {
 				'cyber-pulse': {
 					'0%, 100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)' },
 					'50%': { boxShadow: '0 0 30px rgba(139, 92, 246, 0.6), 0 0 40px rgba(139, 92, 246, 0.3)' }
+					'0%, 100%': { 
+						boxShadow: '0 0 20px rgba(14, 165, 233, 0.3)' 
+					},
+					'50%': { 
+						boxShadow: '0 0 30px rgba(14, 165, 233, 0.6), 0 0 40px rgba(14, 165, 233, 0.3)' 
+					}
+				},
+				'electric-pulse': {
+					'0%, 100%': { 
+						boxShadow: '0 0 15px rgba(14, 165, 233, 0.4), 0 0 30px rgba(14, 165, 233, 0.2)' 
+					},
+					'50%': { 
+						boxShadow: '0 0 25px rgba(14, 165, 233, 0.7), 0 0 50px rgba(14, 165, 233, 0.4), 0 0 75px rgba(14, 165, 233, 0.2)' 
+					}
+				},
+				'neon-pulse': {
+					'0%, 100%': { 
+						boxShadow: '0 0 15px rgba(16, 185, 129, 0.4), 0 0 30px rgba(16, 185, 129, 0.2)' 
+					},
+					'50%': { 
+						boxShadow: '0 0 25px rgba(16, 185, 129, 0.7), 0 0 50px rgba(16, 185, 129, 0.4)' 
+					}
+				},
+				'matrix-rain': {
+					'0%': { transform: 'translateY(-100%)', opacity: '0' },
+					'10%': { opacity: '1' },
+					'90%': { opacity: '1' },
+					'100%': { transform: 'translateY(100vh)', opacity: '0' }
+				},
+				'cyber-scan': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(100%)' }
 				}
 			},
 			animation: {
@@ -274,6 +386,15 @@ export default {
 				'dropdown-open': 'dropdown-open 0.15s ease-out',
 				'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
 				'cyber-pulse': 'cyber-pulse 2s ease-in-out infinite'
+				'electric-pulse': 'electric-pulse 1.5s ease-in-out infinite',
+				'neon-pulse': 'neon-pulse 2s ease-in-out infinite',
+				'matrix-rain': 'matrix-rain 3s linear infinite',
+				'cyber-scan': 'cyber-scan 2s ease-in-out infinite'
+			},
+			backgroundImage: {
+				'tech-grid': 'linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px)',
+				'cyber-gradient': 'linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(16, 185, 129, 0.05) 50%, rgba(168, 85, 247, 0.1) 100%)',
+				'matrix-gradient': 'linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, transparent 50%, rgba(16, 185, 129, 0.05) 100%)'
 			}
 		}
 	},
