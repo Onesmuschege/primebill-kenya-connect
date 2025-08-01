@@ -19,90 +19,90 @@ export default {
 		},
 		extend: {
 			colors: {
-				// Modern Tech + Kenyan Accent + Cybersecurity Theme Colors
-				'ocean-blue': {
-					50: '#e6f4ff',
-					100: '#bae0ff',
-					200: '#91ccff',
-					300: '#69b8ff',
-					400: '#40a4ff',
-					500: '#0077B6', // Primary Ocean Blue
-					600: '#006ba3',
-					700: '#005c8f',
-					800: '#004d7a',
-					900: '#003d66',
+				// Modern Cyberpunk Tech Theme Colors
+				'cyber-blue': {
+					50: '#e0f7ff',
+					100: '#b3ecff',
+					200: '#80e0ff',
+					300: '#4dd4ff',
+					400: '#1ac8ff',
+					500: '#0EA5E9', // Primary Electric Blue
+					600: '#0c94d6',
+					700: '#0a83c3',
+					800: '#0872b0',
+					900: '#06619d',
 				},
-				'forest-green': {
-					50: '#e8f5e8',
-					100: '#c3e6c3',
-					200: '#9dd69d',
-					300: '#78c678',
-					400: '#52b652',
-					500: '#2E8B57', // Accent Forest Green
-					600: '#297d4e',
-					700: '#246f44',
-					800: '#1f613b',
-					900: '#1a5331',
+				'cyber-purple': {
+					50: '#f3e8ff',
+					100: '#e9d5ff',
+					200: '#d8b4ff',
+					300: '#c084fc',
+					400: '#a855f7',
+					500: '#8B5CF6', // Electric Purple
+					600: '#7c3aed',
+					700: '#6d28d9',
+					800: '#5b21b6',
+					900: '#4c1d95',
 				},
-				'cyber-navy': {
-					50: '#e6ecf5',
-					100: '#bfd1e6',
-					200: '#99b6d6',
-					300: '#729bc7',
-					400: '#4c80b7',
-					500: '#0A192F', // Dark Base Cyber Navy
-					600: '#09172a',
-					700: '#081425',
-					800: '#061220',
-					900: '#050f1a',
+				'cyber-orange': {
+					50: '#fff7ed',
+					100: '#ffedd5',
+					200: '#fed7aa',
+					300: '#fdba74',
+					400: '#fb923c',
+					500: '#F97316', // Cyber Orange
+					600: '#ea580c',
+					700: '#c2410c',
+					800: '#9a3412',
+					900: '#7c2d12',
 				},
-				'sand-gold': {
-					50: '#fefaf5',
-					100: '#fcf2e6',
-					200: '#f9e9d6',
-					300: '#f7e1c7',
-					400: '#f5d8b7',
-					500: '#F4A460', // Card Accent Sand Gold
-					600: '#f19440',
-					700: '#ee8320',
-					800: '#eb7300',
-					900: '#d66700',
+				'cyber-black': {
+					50: '#f8fafc',
+					100: '#f1f5f9',
+					200: '#e2e8f0',
+					300: '#cbd5e1',
+					400: '#94a3b8',
+					500: '#0A0D14', // Deep Space Black
+					600: '#1F2937',
+					700: '#374151',
+					800: '#4B5563',
+					900: '#6B7280',
 				},
-				'charcoal-grey': {
-					50: '#f5f5f5',
-					100: '#e8e8e8',
-					200: '#dadada',
-					300: '#cdcdcd',
-					400: '#bfbfbf',
-					500: '#1F1F1F', // Text Charcoal Grey
-					600: '#1c1c1c',
-					700: '#191919',
-					800: '#161616',
-					900: '#131313',
+				'cyber-gray': {
+					50: '#f9fafb',
+					100: '#f3f4f6',
+					200: '#e5e7eb',
+					300: '#d1d5db',
+					400: '#9ca3af',
+					500: '#6B7280', // Cyber Gray
+					600: '#4B5563',
+					700: '#374151',
+					800: '#1F2937',
+					900: '#111827',
 				},
-				'light-grey': {
-					50: '#fdfdfd',
-					100: '#fcfcfc',
-					200: '#fafafa',
-					300: '#f9f9f9',
-					400: '#f8f8f8',
-					500: '#F8F9FA', // Background Light Grey
-					600: '#e0e1e3',
-					700: '#c7c9cc',
-					800: '#afb0b4',
-					900: '#96989d',
+				'cyber-green': {
+					50: '#ecfdf5',
+					100: '#d1fae5',
+					200: '#a7f3d0',
+					300: '#6ee7b7',
+					400: '#34d399',
+					500: '#10B981', // Cyber Green
+					600: '#059669',
+					700: '#047857',
+					800: '#065f46',
+					900: '#064e3b',
 				},
-				'alert-red': {
-					50: '#fff5f5',
-					100: '#ffe0e0',
-					200: '#ffcccc',
-					300: '#ffb3b3',
-					400: '#ff9999',
-					500: '#FF4C4C', // Alert/Errors Red
-					600: '#e63333',
-					700: '#cc1a1a',
-					800: '#b30000',
-					900: '#990000',
+				'cyber-red': {
+					50: '#fef2f2',
+					100: '#fee2e2',
+					200: '#fecaca',
+					300: '#fca5a5',
+					400: '#f87171',
+					500: '#EF4444', // Neon Red
+					600: '#dc2626',
+					700: '#b91c1c',
+					800: '#991b1b',
+					900: '#7f1d1d',
 				},
 				
 				// Professional ISP theme colors (preserved for compatibility)
@@ -212,8 +212,9 @@ export default {
 				'strong': '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 2px 8px -2px rgba(0, 0, 0, 0.1)',
 				'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
 				'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-				'cyber': '0 4px 20px rgba(10, 25, 47, 0.3), 0 2px 10px rgba(0, 119, 182, 0.1)',
-				'glow': '0 0 20px rgba(0, 119, 182, 0.3), 0 0 40px rgba(0, 119, 182, 0.1)',
+				'cyber': '0 4px 20px rgba(10, 13, 20, 0.3), 0 2px 10px rgba(14, 165, 233, 0.1)',
+				'glow': '0 0 20px rgba(14, 165, 233, 0.3), 0 0 40px rgba(14, 165, 233, 0.1)',
+				'cyber-glow': '0 0 30px rgba(139, 92, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.2)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -256,8 +257,12 @@ export default {
 					'100%': { opacity: '1', transform: 'translateY(0) scale(1)' }
 				},
 				'glow-pulse': {
-					'0%, 100%': { boxShadow: '0 0 20px rgba(0, 119, 182, 0.3)' },
-					'50%': { boxShadow: '0 0 30px rgba(0, 119, 182, 0.6), 0 0 40px rgba(0, 119, 182, 0.3)' }
+					'0%, 100%': { boxShadow: '0 0 20px rgba(14, 165, 233, 0.3)' },
+					'50%': { boxShadow: '0 0 30px rgba(14, 165, 233, 0.6), 0 0 40px rgba(14, 165, 233, 0.3)' }
+				},
+				'cyber-pulse': {
+					'0%, 100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)' },
+					'50%': { boxShadow: '0 0 30px rgba(139, 92, 246, 0.6), 0 0 40px rgba(139, 92, 246, 0.3)' }
 				}
 			},
 			animation: {
@@ -267,7 +272,8 @@ export default {
 				'slide-up': 'slide-up 0.3s ease-out',
 				'scale-in': 'scale-in 0.2s ease-out',
 				'dropdown-open': 'dropdown-open 0.15s ease-out',
-				'glow-pulse': 'glow-pulse 2s ease-in-out infinite'
+				'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+				'cyber-pulse': 'cyber-pulse 2s ease-in-out infinite'
 			}
 		}
 	},

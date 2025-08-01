@@ -193,7 +193,7 @@ export const PaymentForm = () => {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="max-w-2xl mx-auto cyber-card">
       <CardHeader>
         <CardTitle className="flex items-center">
           <CreditCard className="h-5 w-5 mr-2" />
@@ -208,7 +208,7 @@ export const PaymentForm = () => {
             const plan = plans.find(p => p.id === value);
             setSelectedPlan(plan || null);
           }}>
-            <SelectTrigger>
+            <SelectTrigger className="border-cyber-blue-200 focus:border-cyber-blue-500">
               <SelectValue placeholder="Choose your internet plan" />
             </SelectTrigger>
             <SelectContent>
@@ -226,16 +226,16 @@ export const PaymentForm = () => {
 
         {/* Selected Plan Details */}
         {selectedPlan && (
-          <Card className="bg-blue-50">
+          <Card className="bg-cyber-blue-50/10 border-cyber-blue-200">
             <CardContent className="pt-4">
-              <h3 className="font-semibold text-lg">{selectedPlan.name}</h3>
+              <h3 className="font-semibold text-lg text-foreground">{selectedPlan.name}</h3>
               <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-                <div>Speed: {selectedPlan.speed_limit_mbps} Mbps</div>
-                <div>Validity: {selectedPlan.validity_days} days</div>
-                <div>Price: KES {selectedPlan.price_kes.toLocaleString()}</div>
+                <div className="text-muted-foreground">Speed: {selectedPlan.speed_limit_mbps} Mbps</div>
+                <div className="text-muted-foreground">Validity: {selectedPlan.validity_days} days</div>
+                <div className="text-muted-foreground">Price: KES {selectedPlan.price_kes.toLocaleString()}</div>
               </div>
               {selectedPlan.description && (
-                <p className="text-sm text-gray-600 mt-2">{selectedPlan.description}</p>
+                <p className="text-sm text-muted-foreground mt-2">{selectedPlan.description}</p>
               )}
             </CardContent>
           </Card>
@@ -251,31 +251,32 @@ export const PaymentForm = () => {
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             disabled={loading}
+            className="border-cyber-blue-200 focus:border-cyber-blue-500"
           />
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Enter the phone number linked to your M-Pesa account
           </p>
         </div>
 
         {/* Payment Status */}
         {paymentStatus === 'processing' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="bg-cyber-orange-50 border border-cyber-orange-200 rounded-lg p-4">
             <div className="flex items-center">
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              <span>Payment processing... Check your phone for M-Pesa prompt</span>
+              <span className="text-cyber-orange-800">Payment processing... Check your phone for M-Pesa prompt</span>
             </div>
           </div>
         )}
 
         {paymentStatus === 'success' && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <span className="text-green-800">Payment successful! Your subscription is now active.</span>
+          <div className="bg-cyber-green-50 border border-cyber-green-200 rounded-lg p-4">
+            <span className="text-cyber-green-800">Payment successful! Your subscription is now active.</span>
           </div>
         )}
 
         {paymentStatus === 'failed' && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <span className="text-red-800">Payment failed. Please try again.</span>
+          <div className="bg-cyber-red-50 border border-cyber-red-200 rounded-lg p-4">
+            <span className="text-cyber-red-800">Payment failed. Please try again.</span>
           </div>
         )}
 
@@ -283,7 +284,7 @@ export const PaymentForm = () => {
         <Button 
           onClick={handlePayment} 
           disabled={!selectedPlan || !phoneNumber || loading}
-          className="w-full"
+          className="w-full btn-primary"
           size="lg"
         >
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
