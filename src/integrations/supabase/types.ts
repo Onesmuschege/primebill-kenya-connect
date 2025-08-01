@@ -436,13 +436,15 @@ export type Database = {
         Returns: boolean
       }
       log_activity: {
-        Args: {
-          p_user_id: string
-          p_action: string
-          p_details?: Json
-          p_ip_address?: unknown
-          p_user_agent?: string
-        }
+        Args:
+          | Record<PropertyKey, never>
+          | {
+              p_user_id: string
+              p_action: string
+              p_details?: Json
+              p_ip_address?: unknown
+              p_user_agent?: string
+            }
         Returns: undefined
       }
     }
