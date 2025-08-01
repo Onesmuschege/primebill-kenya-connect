@@ -271,7 +271,7 @@ const config: Config = {
         'neon': '0 0 10px rgba(16, 185, 129, 0.4), 0 0 20px rgba(16, 185, 129, 0.2), 0 0 30px rgba(16, 185, 129, 0.1)',
       }
     }
-  },
+  }, 
   plugins: [tailwindcssAnimate],
 };
 
