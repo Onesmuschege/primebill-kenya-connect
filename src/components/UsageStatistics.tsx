@@ -216,7 +216,7 @@ const UsageStatistics = () => {
                 <Progress 
                   value={getUsagePercentage()} 
                   className="h-2"
-                  indicatorClassName={`bg-blue-600 ${getUsageColor(getUsagePercentage()) === 'destructive' ? 'bg-red-500' : ''}`}
+                  
                 />
                 <div className="flex justify-between text-xs text-blue-600 dark:text-blue-400">
                   <span>0 GB</span>

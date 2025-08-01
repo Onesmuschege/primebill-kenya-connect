@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Download, Calendar, TrendingUp, Users, DollarSign, Wifi, FileText, BarChart3, PieChart } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, endOfDay, subDays, subMonths } from 'date-fns';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie as RechartsPie, Cell, LineChart, Line } from 'recharts';
 import { CSVLink } from 'react-csv';
 
 interface RevenueData {
@@ -185,7 +185,7 @@ export const ReportsAnalytics = () => {
         const planStats: { [key: string]: { revenue: number; count: number } } = {};
         
         planRevenue.forEach(payment => {
-          const planName = payment.subscriptions?.plans?.name || 'Unknown';
+          const planName = (payment.subscriptions as any)?.plans?.name || 'Unknown';
           if (!planStats[planName]) {
             planStats[planName] = { revenue: 0, count: 0 };
           }
@@ -272,7 +272,7 @@ export const ReportsAnalytics = () => {
             'Customer Phone': payment.users?.phone || 'N/A',
             'Amount (KES)': payment.amount_kes,
             'Payment Method': payment.method,
-            'Plan': payment.subscriptions?.plans?.name || 'N/A',
+            'Plan': (payment.subscriptions as any)?.plans?.name || 'N/A',
             'Date': format(new Date(payment.created_at), 'yyyy-MM-dd HH:mm'),
             'Status': payment.status
           })) || [];
@@ -580,7 +580,7 @@ export const ReportsAnalytics = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <RechartsPieChart>
                     <Tooltip />
-                    <RechartsPieChart 
+                    <RechartsPie 
                       data={planData} 
                       dataKey="revenue" 
                       nameKey="plan_name"
@@ -591,7 +591,7 @@ export const ReportsAnalytics = () => {
                       {planData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
-                    </RechartsPieChart>
+                    </RechartsPie>
                   </RechartsPieChart>
                 </ResponsiveContainer>
               </CardContent>

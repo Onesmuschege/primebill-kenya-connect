@@ -24,12 +24,13 @@ interface UserSession {
   id: string;
   user_id: string;
   router_id: string;
-  ip_address: string;
+  ip_address: string | unknown;
   mac_address: string;
   session_start: string;
+  connection_start?: string;
   subscription?: {
     id: string;
-    plan: {
+    plans?: {
       name: string;
       speed_limit_mbps: number;
     };
@@ -107,8 +108,11 @@ export const CaptivePortal = () => {
         .single();
 
       if (!error && session) {
-        setUserSession(session);
-        setCurrentUser(session.users);
+        setUserSession({
+          ...session,
+          session_start: session.connection_start || new Date().toISOString()
+        });
+        setCurrentUser(session.users as any);
       }
     } catch (error: unknown) {
       console.error('Error checking session:', error);
@@ -162,7 +166,7 @@ export const CaptivePortal = () => {
     } catch (error: unknown) {
       toast({
         title: "Error",
-        description: error.message || "Login failed",
+        description: (error as any)?.message || "Login failed",
         variant: "destructive",
       });
     } finally {
@@ -216,7 +220,7 @@ export const CaptivePortal = () => {
     } catch (error: unknown) {
       toast({
         title: "Error",
-        description: error.message || "Registration failed",
+        description: (error as any)?.message || "Registration failed",
         variant: "destructive",
       });
     } finally {
@@ -234,7 +238,7 @@ export const CaptivePortal = () => {
           *,
           plans (*)
         `)
-        .eq('user_id', currentUser.id)
+        .eq('user_id', (currentUser as any)?.id)
         .eq('status', 'active')
         .gte('end_date', new Date().toISOString().split('T')[0])
         .single();
@@ -254,7 +258,7 @@ export const CaptivePortal = () => {
       const { data: connection, error: connectionError } = await supabase
         .from('user_connections')
         .insert([{
-          user_id: currentUser.id,
+          user_id: (currentUser as any)?.id,
           router_id: routerId,
           ip_address: clientIp,
           mac_address: clientMac,
@@ -269,9 +273,9 @@ export const CaptivePortal = () => {
       const { error: routerError } = await supabase.functions.invoke('router-control', {
         body: {
           action: 'create_user',
-          user_id: currentUser.id,
+          user_id: (currentUser as any)?.id,
           router_id: routerId,
-          username: currentUser.phone || currentUser.email,
+          username: (currentUser as any)?.phone || (currentUser as any)?.email,
           profile: `Plan_${subscription.plans.speed_limit_mbps}M`
         }
       });
@@ -327,9 +331,9 @@ export const CaptivePortal = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="bg-muted p-4 rounded-lg">
-              <p><strong>User:</strong> {currentUser.name}</p>
-              <p><strong>Plan:</strong> {userSession.subscription?.plan.name}</p>
-              <p><strong>Speed:</strong> {userSession.subscription?.plan.speed_limit_mbps}Mbps</p>
+              <p><strong>User:</strong> {(currentUser as any)?.name}</p>
+              <p><strong>Plan:</strong> {userSession.subscription?.plans?.name}</p>
+              <p><strong>Speed:</strong> {userSession.subscription?.plans?.speed_limit_mbps}Mbps</p>
               <p><strong>Valid Until:</strong> {new Date(userSession.subscription?.end_date || '').toLocaleDateString()}</p>
             </div>
             <Button 
@@ -350,7 +354,7 @@ export const CaptivePortal = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {currentUser.name || currentUser.email}!</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {(currentUser as any)?.name || (currentUser as any)?.email}!</h1>
             <p className="text-gray-600">Choose a plan to get connected</p>
           </div>
 
