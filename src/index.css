@@ -11,69 +11,69 @@
 
 @layer base {
   :root {
-    /* Improved Color Palette - Gunmetal Navy Theme */
-    --background: 222 84% 5%; /* #0F172A - Gunmetal Navy */
-    --foreground: 210 40% 98%; /* #F1F5F9 - Text Primary */
-    --card: 217 33% 17%; /* #1E293B - Dark Slate */
+    /* Modern Tech Network Theme - Cyberpunk Inspired */
+    --background: 220 23% 6%; /* #0A0D14 - Deep Space Black */
+    --foreground: 210 40% 98%; /* #F1F5F9 - Pure White */
+    --card: 220 23% 9%; /* #111827 - Dark Slate */
     --card-foreground: 210 40% 98%;
-    --popover: 217 33% 17%;
+    --popover: 220 23% 9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%; /* #3B82F6 - Blue-500 */
+    --primary: 199 89% 48%; /* #0EA5E9 - Electric Blue */
     --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 17%;
+    --secondary: 220 23% 12%; /* #1F2937 - Dark Gray */
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
+    --muted: 220 23% 12%;
     --muted-foreground: 148 16% 47%; /* #94A3B8 - Text Secondary */
-    --accent: 217 91% 60%;
+    --accent: 262 83% 58%; /* #8B5CF6 - Electric Purple */
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 84% 60%; /* #EF4444 - Red-500 */
+    --destructive: 0 84% 60%; /* #EF4444 - Neon Red */
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
+    --border: 220 23% 12%;
+    --input: 220 23% 12%;
+    --ring: 199 89% 48%;
     --radius: 0.75rem;
-    --chart-1: 217 91% 60%; /* Blue-500 */
-    --chart-2: 146 50% 36%; /* Forest Green */
-    --chart-3: 40 71% 67%; /* Sand Gold */
-    --chart-4: 222 84% 5%; /* Gunmetal Navy */
-    --chart-5: 0 84% 60%; /* Red-500 */
+    --chart-1: 199 89% 48%; /* Electric Blue */
+    --chart-2: 262 83% 58%; /* Electric Purple */
+    --chart-3: 34 97% 64%; /* Cyber Orange */
+    --chart-4: 220 23% 6%; /* Deep Space Black */
+    --chart-5: 0 84% 60%; /* Neon Red */
     
-    /* Sidebar theme - Gunmetal Navy base */
-    --sidebar-background: 222 84% 5%; /* Gunmetal Navy */
+    /* Sidebar theme - Cyberpunk base */
+    --sidebar-background: 220 23% 6%; /* Deep Space Black */
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%; /* Blue-500 */
+    --sidebar-primary: 199 89% 48%; /* Electric Blue */
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 146 50% 36%; /* Forest Green */
+    --sidebar-accent: 262 83% 58%; /* Electric Purple */
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-border: 220 23% 12%;
+    --sidebar-ring: 199 89% 48%;
   }
 
   .dark {
-    /* Professional dark mode with Gunmetal Navy theme */
-    --background: 222 84% 5%; /* Gunmetal Navy background */
+    /* Professional dark mode with Cyberpunk theme */
+    --background: 220 23% 6%; /* Deep Space Black background */
     --foreground: 210 40% 98%;
-    --card: 217 33% 17%; /* Dark Slate */
+    --card: 220 23% 9%; /* Dark Slate */
     --card-foreground: 210 40% 98%;
-    --popover: 217 33% 17%;
+    --popover: 220 23% 9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%; /* Blue-500 */
-    --primary-foreground: 222 84% 5%;
-    --secondary: 217 33% 17%;
+    --primary: 199 89% 48%; /* Electric Blue */
+    --primary-foreground: 220 23% 6%;
+    --secondary: 220 23% 12%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
+    --muted: 220 23% 12%;
     --muted-foreground: 148 16% 47%; /* #94A3B8 - Text Secondary */
-    --accent: 146 50% 45%; /* Forest Green accent */
+    --accent: 262 83% 58%; /* Electric Purple accent */
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 84% 60%; /* #EF4444 - Red-500 */
+    --destructive: 0 84% 60%; /* #EF4444 - Neon Red */
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
-    --chart-1: 217 91% 60%;
-    --chart-2: 146 50% 45%;
-    --chart-3: 40 71% 67%;
-    --chart-4: 217 33% 17%;
+    --border: 220 23% 12%;
+    --input: 220 23% 12%;
+    --ring: 199 89% 48%;
+    --chart-1: 199 89% 48%;
+    --chart-2: 262 83% 58%;
+    --chart-3: 34 97% 64%;
+    --chart-4: 220 23% 12%;
     --chart-5: 0 84% 60%;
   }
 }
@@ -83,11 +83,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-slate-950 text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Tech-inspired subtle pattern */
-    background-image: radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.03) 1px, transparent 0);
-    background-size: 40px 40px;
+    /* Tech-inspired subtle pattern with cyberpunk aesthetic */
+    background-image: 
+      radial-gradient(circle at 1px 1px, rgba(14, 165, 233, 0.05) 1px, transparent 0),
+      linear-gradient(45deg, transparent 49%, rgba(139, 92, 246, 0.02) 50%, transparent 51%);
+    background-size: 40px 40px, 80px 80px;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -218,23 +220,23 @@
   }
   
   .cyber-card {
-    @apply bg-background/90 backdrop-blur-sm rounded-2xl border border-primary/20 shadow-cyber text-foreground;
+    @apply bg-slate-900/90 backdrop-blur-sm rounded-2xl border border-cyber-blue/20 shadow-cyber text-foreground;
   }
   
   .gradient-primary {
-    @apply bg-gradient-to-r from-blue-600 to-blue-700;
+    @apply bg-gradient-to-r from-cyber-blue-600 to-cyber-blue-700;
   }
   
   .gradient-accent {
-    @apply bg-gradient-to-r from-green-500 to-green-600;
+    @apply bg-gradient-to-r from-cyber-purple-500 to-cyber-purple-600;
   }
   
   .gradient-cyber {
-    @apply bg-gradient-to-br from-slate-800 via-slate-700 to-blue-800;
+    @apply bg-gradient-to-br from-cyber-black-500 via-cyber-gray-700 to-cyber-blue-800;
   }
   
   .gradient-kenyan {
-    @apply bg-gradient-to-r from-yellow-400 to-yellow-600;
+    @apply bg-gradient-to-r from-cyber-orange-400 to-cyber-orange-600;
   }
   
   .status-indicator {
@@ -242,19 +244,19 @@
   }
   
   .status-active {
-    @apply status-indicator bg-green-100 text-green-800;
+    @apply status-indicator bg-cyber-green-100 text-cyber-green-800 dark:bg-cyber-green-900 dark:text-cyber-green-200;
   }
   
   .status-inactive {
-    @apply status-indicator bg-gray-100 text-gray-800;
+    @apply status-indicator bg-cyber-gray-100 text-cyber-gray-800 dark:bg-cyber-gray-900 dark:text-cyber-gray-200;
   }
   
   .status-pending {
-    @apply status-indicator bg-yellow-100 text-yellow-800;
+    @apply status-indicator bg-cyber-orange-100 text-cyber-orange-800 dark:bg-cyber-orange-900 dark:text-cyber-orange-200;
   }
   
   .status-error {
-    @apply status-indicator bg-red-100 text-red-800;
+    @apply status-indicator bg-cyber-red-100 text-cyber-red-800 dark:bg-cyber-red-900 dark:text-cyber-red-200;
   }
   
   .section-divider {
@@ -266,27 +268,31 @@
   }
   
   .cyber-border {
-    @apply border border-primary/30 shadow-cyber;
+    @apply border border-cyber-blue/30 shadow-cyber;
   }
   
-  .kenyan-accent {
-    @apply border-l-4 border-yellow-500 bg-yellow-50/50;
+  .cyber-accent {
+    @apply border-l-4 border-cyber-purple-500 bg-cyber-purple-50/50 dark:bg-cyber-purple-900/20;
   }
   
   .btn-primary {
-    @apply bg-primary hover:bg-blue-600 text-primary-foreground rounded-lg transition-all duration-200 ease-in-out shadow-md hover:shadow-lg;
+    @apply bg-cyber-blue-600 hover:bg-cyber-blue-700 text-white rounded-lg transition-all duration-200 ease-in-out shadow-md hover:shadow-lg;
   }
   
   .btn-secondary {
-    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg transition-all duration-200 ease-in-out;
+    @apply bg-cyber-gray-600 hover:bg-cyber-gray-700 text-white rounded-lg transition-all duration-200 ease-in-out;
+  }
+  
+  .btn-accent {
+    @apply bg-cyber-purple-600 hover:bg-cyber-purple-700 text-white rounded-lg transition-all duration-200 ease-in-out shadow-md hover:shadow-lg;
   }
   
   .navbar-cyber {
-    @apply bg-background text-foreground shadow-cyber;
+    @apply bg-slate-950 text-foreground shadow-cyber;
   }
   
   .footer-cyber {
-    @apply bg-background text-foreground border-t border-border;
+    @apply bg-slate-950 text-foreground border-t border-border;
   }
   
   /* Mobile-specific improvements */
@@ -295,7 +301,7 @@
   }
   
   .mobile-nav {
-    @apply sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-cyber-navy-500 border-t border-ocean-blue-400/20;
+    @apply sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-cyber-black-500 border-t border-cyber-blue-400/20;
   }
   
   /* Animation delays for staggered effects */
@@ -309,6 +315,23 @@
   
   .animation-delay-1000 {
     animation-delay: 1000ms;
+  }
+  
+  /* Cyberpunk theme specific utilities */
+  .cyber-text-glow {
+    @apply text-cyber-blue-400 drop-shadow-[0_0_8px_rgba(14,165,233,0.3)];
+  }
+  
+  .cyber-border-glow {
+    @apply border border-cyber-blue/50 shadow-[0_0_20px_rgba(14,165,233,0.2)];
+  }
+  
+  .cyber-bg-gradient {
+    @apply bg-gradient-to-br from-cyber-black-500 via-cyber-gray-700 to-cyber-blue-900;
+  }
+  
+  .cyber-card-hover {
+    @apply hover:shadow-cyber-glow hover:border-cyber-purple/50 transition-all duration-300;
   }
 }
 

@@ -201,21 +201,21 @@ const UserDashboard = React.memo(() => {
       <UserStats subscription={subscription} daysRemaining={daysRemaining} />
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs defaultValue="plans" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5 bg-white shadow-soft border">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-cyber-blue-600 data-[state=active]:text-white">
             Overview
           </TabsTrigger>
-          <TabsTrigger value="usage" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+          <TabsTrigger value="usage" className="data-[state=active]:bg-cyber-blue-600 data-[state=active]:text-white">
             Usage
           </TabsTrigger>
-          <TabsTrigger value="plans" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+          <TabsTrigger value="plans" className="data-[state=active]:bg-cyber-blue-600 data-[state=active]:text-white">
             Plans
           </TabsTrigger>
-          <TabsTrigger value="payments" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+          <TabsTrigger value="payments" className="data-[state=active]:bg-cyber-blue-600 data-[state=active]:text-white">
             Payments
           </TabsTrigger>
-          <TabsTrigger value="history" className="data-[state=active]:bg-isp-blue-600 data-[state=active]:text-white">
+          <TabsTrigger value="history" className="data-[state=active]:bg-cyber-blue-600 data-[state=active]:text-white">
             History
           </TabsTrigger>
         </TabsList>
@@ -235,14 +235,8 @@ const UserDashboard = React.memo(() => {
           <UsageStatistics />
         </TabsContent>
 
-                 <TabsContent value="plans">
-          <div className="space-y-6">
-            <SupabaseTest />
-            <SupabaseClientTest />
-            <ReactQueryTest />
-            <PlansTest />
-            <PlanUpgradeEnhanced />
-          </div>
+        <TabsContent value="plans">
+          <PlanUpgradeEnhanced />
         </TabsContent>
 
         <TabsContent value="payments">
