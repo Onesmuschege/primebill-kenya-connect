@@ -423,6 +423,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_admin_user: {
+        Args: { admin_email: string; admin_password: string }
+        Returns: string
+      }
       expire_subscriptions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
