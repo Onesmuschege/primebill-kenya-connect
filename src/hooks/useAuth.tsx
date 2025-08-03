@@ -1,6 +1,3 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User } from '@supabase/supabase-js';
-
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,40 +28,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Clear invalid session and force re-authentication
   const clearInvalidSession = useCallback(async () => {
     console.log('Clearing invalid session...');
     try {
-      // Sign out from Supabase
       await supabase.auth.signOut();
-      
-      // Clear all storage
       localStorage.clear();
       sessionStorage.clear();
-      
-      // Reset state
       setUser(null);
       setSession(null);
       setLoading(false);
-      
-      // Reload page to ensure clean state
       window.location.reload();
     } catch (error) {
       console.error('Error clearing session:', error);
-      // Force reload anyway
       window.location.reload();
     }
   }, []);
 
-  // Global auth error handler
   const handleAuthError = useCallback((error: any) => {
     console.error('Auth error:', error);
-    
-    // Check for token refresh failures
-    if (error?.message?.includes('Failed to fetch') || 
-        error?.message?.includes('refresh_token') ||
-        error?.status === 0 ||
-        error?.__isAuthError) {
+    if (
+      error?.message?.includes('Failed to fetch') ||
+      error?.message?.includes('refresh_token') ||
+      error?.status === 0 ||
+      error?.__isAuthError
+    ) {
       console.log('Detected auth token issue, clearing session...');
       clearInvalidSession();
     }
@@ -73,16 +60,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error('Session retrieval error:', error);
           handleAuthError(error);
           return;
         }
-        
+
         if (session?.user) {
           setSession(session);
           await fetchUserProfile(session.user);
@@ -102,15 +87,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initializeAuth();
 
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
 
-      if (session?.user) {
-        await fetchUserProfile(session.user);
-      } else {
-        setUser(null);
-      
       try {
         if (session?.user) {
           setSession(session);
@@ -127,13 +106,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    // THEN initialize auth
-    initializeAuth();
-
     return () => subscription.unsubscribe();
   }, [handleAuthError]);
 
-  // ✅ Rewritten fetchUserProfile with best practices
   const fetchUserProfile = async (authUser: User) => {
     try {
       const { data: profile, error } = await supabase
@@ -171,206 +146,123 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Signed in successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-      throw error;
     const maxRetries = 3;
     let retryCount = 0;
-    
+
     while (retryCount < maxRetries) {
       try {
-        console.log(`Sign in attempt ${retryCount + 1}/${maxRetries}`);
-        
-        // Add timeout to prevent hanging requests
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-        
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+
         clearTimeout(timeoutId);
-        
+
         if (error) {
-          console.error('Sign in error:', error);
-          
-          // Check for specific error types that shouldn't be retried
-          if (error.message.includes('Invalid login credentials') || 
-              error.message.includes('Email not confirmed') ||
-              error.message.includes('Too many requests')) {
-            throw error; // Don't retry these errors
+          if (
+            error.message.includes('Invalid login credentials') ||
+            error.message.includes('Email not confirmed') ||
+            error.message.includes('Too many requests')
+          ) {
+            throw error;
           }
-          
-          // For network errors, try again
+
           if (retryCount < maxRetries - 1) {
             retryCount++;
-            console.log(`Retrying sign in in ${retryCount * 1000}ms...`);
-            await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+            await new Promise(res => setTimeout(res, retryCount * 1000));
             continue;
           }
-          
+
           throw error;
         }
-        
-        toast({
-          title: "Success",
-          description: "Signed in successfully",
-        });
-        return; // Success, exit retry loop
-        
+
+        toast({ title: 'Success', description: 'Signed in successfully' });
+        return;
       } catch (error: any) {
-        console.error(`Sign in attempt ${retryCount + 1} failed:`, error);
-        
-        // If it's an AbortError (timeout), handle it specifically
         if (error.name === 'AbortError') {
-          console.error('Sign in request timed out');
           error.message = 'Request timed out. Please check your connection and try again.';
         }
-        
-        // If this is the last retry or a non-retryable error, handle and throw
-        if (retryCount >= maxRetries - 1 || 
-            error.message.includes('Invalid login credentials') || 
-            error.message.includes('Email not confirmed') ||
-            error.message.includes('Too many requests')) {
-          
+
+        if (
+          retryCount >= maxRetries - 1 ||
+          error.message.includes('Invalid login credentials') ||
+          error.message.includes('Email not confirmed') ||
+          error.message.includes('Too many requests')
+        ) {
           handleAuthError(error);
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
+          toast({ title: 'Error', description: error.message, variant: 'destructive' });
           throw error;
         }
-        
-        // Otherwise, retry
+
         retryCount++;
-        console.log(`Retrying sign in in ${retryCount * 1000}ms...`);
-        await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+        await new Promise(res => setTimeout(res, retryCount * 1000));
       }
     }
   };
 
   const signUp = async (email: string, password: string, name: string, phone: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            name,
-            phone,
-          },
-        },
-      });
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Account created successfully! Please check your email to verify your account.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-      throw error;
     const maxRetries = 3;
     let retryCount = 0;
-    
+
     while (retryCount < maxRetries) {
       try {
-        console.log(`Sign up attempt ${retryCount + 1}/${maxRetries}`);
-        
-        // Add timeout to prevent hanging requests
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-        
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              name,
-              phone,
-            },
+            data: { name, phone },
           },
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         if (error) {
-          console.error('Sign up error:', error);
-          
-          // Check for specific error types that shouldn't be retried
-          if (error.message.includes('User already registered') || 
-              error.message.includes('Password should be') ||
-              error.message.includes('Invalid email') ||
-              error.message.includes('Too many requests')) {
-            throw error; // Don't retry these errors
-          }
-          
-          // For network errors, try again
-          if (retryCount < maxRetries - 1) {
-            retryCount++;
-            console.log(`Retrying sign up in ${retryCount * 1000}ms...`);
-            await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
-            continue;
-          }
-          
-          throw error;
-        }
-        
-        toast({
-          title: "Success",
-          description: "Account created successfully! Please check your email to verify your account.",
-        });
-        return; // Success, exit retry loop
-        
-      } catch (error: any) {
-        console.error(`Sign up attempt ${retryCount + 1} failed:`, error);
-        
-        // If it's an AbortError (timeout), handle it specifically
-        if (error.name === 'AbortError') {
-          console.error('Sign up request timed out');
-          error.message = 'Request timed out. Please check your connection and try again.';
-        }
-        
-        // If this is the last retry or a non-retryable error, handle and throw
-        if (retryCount >= maxRetries - 1 || 
-            error.message.includes('User already registered') || 
+          if (
+            error.message.includes('User already registered') ||
             error.message.includes('Password should be') ||
             error.message.includes('Invalid email') ||
-            error.message.includes('Too many requests')) {
-          
-          handleAuthError(error);
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
+            error.message.includes('Too many requests')
+          ) {
+            throw error;
+          }
+
+          if (retryCount < maxRetries - 1) {
+            retryCount++;
+            await new Promise(res => setTimeout(res, retryCount * 1000));
+            continue;
+          }
+
           throw error;
         }
-        
-        // Otherwise, retry
+
+        toast({
+          title: 'Success',
+          description: 'Account created successfully! Please check your email to verify your account.',
+        });
+        return;
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          error.message = 'Request timed out. Please check your connection and try again.';
+        }
+
+        if (
+          retryCount >= maxRetries - 1 ||
+          error.message.includes('User already registered') ||
+          error.message.includes('Password should be') ||
+          error.message.includes('Invalid email') ||
+          error.message.includes('Too many requests')
+        ) {
+          handleAuthError(error);
+          toast({ title: 'Error', description: error.message, variant: 'destructive' });
+          throw error;
+        }
+
         retryCount++;
-        console.log(`Retrying sign up in ${retryCount * 1000}ms...`);
-        await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+        await new Promise(res => setTimeout(res, retryCount * 1000));
       }
     }
   };
@@ -380,16 +272,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Signed out successfully",
-      });
+      toast({ title: 'Success', description: 'Signed out successfully' });
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
       throw error;
     }
   };
@@ -398,41 +283,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       if (!user) throw new Error('No user logged in');
 
-      const { error } = await supabase
-        .from('users')
-        .update(data)
-        .eq('id', user.id);
+      const { error } = await supabase.from('users').update(data).eq('id', user.id);
 
       if (error) throw error;
 
       setUser({ ...user, ...data });
 
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
+      toast({ title: 'Success', description: 'Profile updated successfully' });
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
       throw error;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateProfile }}>
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      signIn,
-      signUp,
-      signOut,
-      updateProfile,
-      clearInvalidSession,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+        updateProfile,
+        clearInvalidSession,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
