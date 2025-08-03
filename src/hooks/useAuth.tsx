@@ -134,55 +134,167 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      
-      toast({
-        title: "Success",
-        description: "Signed in successfully",
-      });
-    } catch (error: any) {
-      console.error('Sign in error:', error);
-      handleAuthError(error);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-      throw error;
+    const maxRetries = 3;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+      try {
+        console.log(`Sign in attempt ${retryCount + 1}/${maxRetries}`);
+        
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (error) {
+          console.error('Sign in error:', error);
+          
+          // Check for specific error types that shouldn't be retried
+          if (error.message.includes('Invalid login credentials') || 
+              error.message.includes('Email not confirmed') ||
+              error.message.includes('Too many requests')) {
+            throw error; // Don't retry these errors
+          }
+          
+          // For network errors, try again
+          if (retryCount < maxRetries - 1) {
+            retryCount++;
+            console.log(`Retrying sign in in ${retryCount * 1000}ms...`);
+            await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+            continue;
+          }
+          
+          throw error;
+        }
+        
+        toast({
+          title: "Success",
+          description: "Signed in successfully",
+        });
+        return; // Success, exit retry loop
+        
+      } catch (error: any) {
+        console.error(`Sign in attempt ${retryCount + 1} failed:`, error);
+        
+        // If it's an AbortError (timeout), handle it specifically
+        if (error.name === 'AbortError') {
+          console.error('Sign in request timed out');
+          error.message = 'Request timed out. Please check your connection and try again.';
+        }
+        
+        // If this is the last retry or a non-retryable error, handle and throw
+        if (retryCount >= maxRetries - 1 || 
+            error.message.includes('Invalid login credentials') || 
+            error.message.includes('Email not confirmed') ||
+            error.message.includes('Too many requests')) {
+          
+          handleAuthError(error);
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+          throw error;
+        }
+        
+        // Otherwise, retry
+        retryCount++;
+        console.log(`Retrying sign in in ${retryCount * 1000}ms...`);
+        await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+      }
     }
   };
 
   const signUp = async (email: string, password: string, name: string, phone: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            name,
-            phone,
+    const maxRetries = 3;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+      try {
+        console.log(`Sign up attempt ${retryCount + 1}/${maxRetries}`);
+        
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              name,
+              phone,
+            },
           },
-        },
-      });
-      if (error) throw error;
-      
-      toast({
-        title: "Success",
-        description: "Account created successfully! Please check your email to verify your account.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-      throw error;
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (error) {
+          console.error('Sign up error:', error);
+          
+          // Check for specific error types that shouldn't be retried
+          if (error.message.includes('User already registered') || 
+              error.message.includes('Password should be') ||
+              error.message.includes('Invalid email') ||
+              error.message.includes('Too many requests')) {
+            throw error; // Don't retry these errors
+          }
+          
+          // For network errors, try again
+          if (retryCount < maxRetries - 1) {
+            retryCount++;
+            console.log(`Retrying sign up in ${retryCount * 1000}ms...`);
+            await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+            continue;
+          }
+          
+          throw error;
+        }
+        
+        toast({
+          title: "Success",
+          description: "Account created successfully! Please check your email to verify your account.",
+        });
+        return; // Success, exit retry loop
+        
+      } catch (error: any) {
+        console.error(`Sign up attempt ${retryCount + 1} failed:`, error);
+        
+        // If it's an AbortError (timeout), handle it specifically
+        if (error.name === 'AbortError') {
+          console.error('Sign up request timed out');
+          error.message = 'Request timed out. Please check your connection and try again.';
+        }
+        
+        // If this is the last retry or a non-retryable error, handle and throw
+        if (retryCount >= maxRetries - 1 || 
+            error.message.includes('User already registered') || 
+            error.message.includes('Password should be') ||
+            error.message.includes('Invalid email') ||
+            error.message.includes('Too many requests')) {
+          
+          handleAuthError(error);
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+          throw error;
+        }
+        
+        // Otherwise, retry
+        retryCount++;
+        console.log(`Retrying sign up in ${retryCount * 1000}ms...`);
+        await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+      }
     }
   };
 
