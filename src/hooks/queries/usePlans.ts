@@ -21,8 +21,6 @@ export const usePlans = (activeOnly: boolean = true) => {
     queryFn: async (): Promise<Plan[]> => {
       console.log('🔍 Fetching plans from Supabase...');
       console.log('📊 Active only:', activeOnly);
-      console.log('🔑 Supabase URL:', supabase.supabaseUrl);
-      console.log('🔑 Supabase Key length:', supabase.supabaseKey?.length || 0);
       
       let query = supabase.from('plans').select('*').order('price_kes', { ascending: true });
       
@@ -66,12 +64,6 @@ export const usePlans = (activeOnly: boolean = true) => {
       console.log(`🔄 Retry attempt ${failureCount + 1} for plans fetch`);
       console.log(`🔄 Error on retry:`, error);
       return failureCount < 3;
-    },
-    onError: (error) => {
-      console.error('💥 Plans query error:', error);
-    },
-    onSuccess: (data) => {
-      console.log('🎉 Plans query success:', data.length, 'plans loaded');
     },
   });
 };

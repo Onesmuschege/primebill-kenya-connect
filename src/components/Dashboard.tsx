@@ -52,12 +52,12 @@ export const Dashboard = () => {
       const [clientsRes, subscriptionsRes, paymentsRes, routersRes] = await Promise.all([
         supabase.from('users').select('id', { count: 'exact', head: true }),
         supabase.from('subscriptions').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('payments').select('amount_kes').eq('status', 'completed'),
-        supabase.from('routers').select('id, online_status', { count: 'exact' })
+        supabase.from('payments').select('amount_kes').eq('status', 'success'),
+        supabase.from('routers').select('id, status', { count: 'exact' })
       ]);
 
       const totalRevenue = paymentsRes.data?.reduce((sum, payment) => sum + payment.amount_kes, 0) || 0;
-      const onlineRouters = routersRes.data?.filter(router => router.online_status).length || 0;
+      const onlineRouters = routersRes.data?.filter(router => router.status === 'online').length || 0;
 
       setStats({
         totalClients: clientsRes.count || 0,
@@ -85,7 +85,7 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header 
-        user={user}
+        user={user as any}
         onSignOut={signOut}
         onProfileClick={() => {
           // Handle profile click - could navigate to profile page

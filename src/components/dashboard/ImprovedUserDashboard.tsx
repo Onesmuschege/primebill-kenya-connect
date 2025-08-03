@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PaymentForm } from '@/components/PaymentForm';
-import { PaymentHistory } from '@/components/PaymentHistory';
+import PaymentHistory from '@/components/PaymentHistory';
 import UsageStatistics from '@/components/UsageStatistics';
 import PlanUpgrade from '@/components/PlanUpgrade';
 import { UserStats } from '@/components/dashboard/UserStats';

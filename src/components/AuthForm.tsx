@@ -7,11 +7,13 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HeroSection } from '@/components/ui/hero-section';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Shield, Lock, ArrowRight } from 'lucide-react';
+import { SupabaseConnectivityTest } from '@/components/SupabaseConnectivityTest';
+import { Loader2, Shield, Lock, ArrowRight, Settings } from 'lucide-react';
 
 export const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const { signIn, signUp } = useAuth();
 
   const [signInData, setSignInData] = useState({
@@ -269,7 +271,25 @@ export const AuthForm = () => {
             <span>•</span>
             <span className="text-sand-gold-600">ISO 27001</span>
           </div>
+          
+          {/* Diagnostics button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDiagnostics(!showDiagnostics)}
+            className="mt-3 text-xs text-charcoal-grey-400 hover:text-charcoal-grey-500"
+          >
+            <Settings className="h-3 w-3 mr-1" />
+            {showDiagnostics ? 'Hide' : 'Show'} Connection Diagnostics
+          </Button>
         </div>
+        
+        {/* Diagnostics panel */}
+        {showDiagnostics && (
+          <div className="mt-4">
+            <SupabaseConnectivityTest />
+          </div>
+        )}
       </div>
     </div>
   );

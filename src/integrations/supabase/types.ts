@@ -423,6 +423,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_admin_user: {
+        Args: { admin_email: string; admin_password: string }
+        Returns: string
+      }
       expire_subscriptions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -436,13 +440,15 @@ export type Database = {
         Returns: boolean
       }
       log_activity: {
-        Args: {
-          p_user_id: string
-          p_action: string
-          p_details?: Json
-          p_ip_address?: unknown
-          p_user_agent?: string
-        }
+        Args:
+          | Record<PropertyKey, never>
+          | {
+              p_user_id: string
+              p_action: string
+              p_details?: Json
+              p_ip_address?: unknown
+              p_user_agent?: string
+            }
         Returns: undefined
       }
     }

@@ -7,7 +7,7 @@ const PlansTest = () => {
   const { data: plans, error, isLoading, refetch } = usePlans(true);
 
   console.log('🔍 PlansTest component render:', {
-    plans: plans?.length || 0,
+    plans: Array.isArray(plans) ? plans.length : 0,
     error: error?.message,
     isLoading
   });
@@ -29,7 +29,7 @@ const PlansTest = () => {
           <div className="text-sm space-y-1">
             <div>Loading: {isLoading ? 'Yes' : 'No'}</div>
             <div>Error: {error ? error.message : 'None'}</div>
-            <div>Plans count: {plans?.length || 0}</div>
+            <div>Plans count: {Array.isArray(plans) ? plans.length : 0}</div>
           </div>
         </div>
         
@@ -40,7 +40,7 @@ const PlansTest = () => {
           </div>
         )}
         
-        {plans && plans.length > 0 && (
+        {Array.isArray(plans) && plans.length > 0 && (
           <div className="space-y-2">
             <h3 className="font-semibold">Loaded Plans:</h3>
             <div className="space-y-1">
@@ -53,7 +53,7 @@ const PlansTest = () => {
           </div>
         )}
         
-        {!isLoading && !error && (!plans || plans.length === 0) && (
+        {!isLoading && !error && (!Array.isArray(plans) || plans.length === 0) && (
           <div className="bg-yellow-100 p-4 rounded-lg">
             <h3 className="font-semibold text-yellow-800">No Plans Found</h3>
             <p className="text-sm text-yellow-700">No active plans were returned from the database.</p>

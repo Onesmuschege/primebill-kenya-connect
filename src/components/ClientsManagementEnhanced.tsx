@@ -112,7 +112,7 @@ export const ClientsManagementEnhanced = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setClients(data || []);
+      setClients((data as any) || []);
     } catch (error) {
       console.error('Error fetching clients:', error);
       toast({
