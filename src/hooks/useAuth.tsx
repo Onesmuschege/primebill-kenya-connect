@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,9 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Get initial session
         const { data: { session } } = await supabase.auth.getSession();
-        
         if (session?.user) {
           await fetchUserProfile(session.user);
         } else {
@@ -45,43 +42,65 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    // Initialize auth
     initializeAuth();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
-      
+
       if (session?.user) {
         await fetchUserProfile(session.user);
       } else {
         setUser(null);
       }
+
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  // ✅ Rewritten fetchUserProfile with best practices
   const fetchUserProfile = async (authUser: User) => {
-    // Temporary bypass: Just set the user directly without database lookup
-    console.log('Setting user directly without profile lookup');
-    setUser({
-      ...authUser,
-      name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
-      phone: authUser.user_metadata?.phone || '',
-      role: 'client',
-    });
+    try {
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('name, phone, role')
+        .eq('id', authUser.id)
+        .single();
+
+      if (error) {
+        console.warn('[Auth] Failed to fetch user profile from DB:', error.message);
+        throw new Error('Could not retrieve user profile from database');
+      }
+
+      if (!profile) {
+        console.warn('[Auth] User profile not found, falling back to user_metadata');
+        setUser({
+          ...authUser,
+          name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+          phone: authUser.user_metadata?.phone || '',
+          role: 'client',
+        });
+        return;
+      }
+
+      setUser({
+        ...authUser,
+        name: profile.name,
+        phone: profile.phone,
+        role: profile.role,
+      });
+    } catch (err: any) {
+      console.error('[Auth] Unexpected error while fetching user profile:', err.message || err);
+      setUser(null);
+    }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      
+
       toast({
         title: "Success",
         description: "Signed in successfully",
@@ -110,7 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
       if (error) throw error;
-      
+
       toast({
         title: "Success",
         description: "Account created successfully! Please check your email to verify your account.",
@@ -129,7 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
+
       toast({
         title: "Success",
         description: "Signed out successfully",
@@ -156,7 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       setUser({ ...user, ...data });
-      
+
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -172,14 +191,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      loading,
-      signIn,
-      signUp,
-      signOut,
-      updateProfile,
-    }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
