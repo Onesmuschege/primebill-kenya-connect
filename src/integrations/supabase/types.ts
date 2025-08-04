@@ -387,31 +387,49 @@ export type Database = {
       }
       users: {
         Row: {
+          account_locked_until: string | null
+          account_status: string | null
           created_at: string
           email: string
+          failed_login_attempts: number | null
           id: string
+          last_login_at: string | null
           name: string
+          password_changed_at: string | null
           phone: string
+          require_password_change: boolean | null
           role: Database["public"]["Enums"]["user_role"]
           status: string
           updated_at: string
         }
         Insert: {
+          account_locked_until?: string | null
+          account_status?: string | null
           created_at?: string
           email: string
+          failed_login_attempts?: number | null
           id: string
+          last_login_at?: string | null
           name: string
+          password_changed_at?: string | null
           phone: string
+          require_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
           updated_at?: string
         }
         Update: {
+          account_locked_until?: string | null
+          account_status?: string | null
           created_at?: string
           email?: string
+          failed_login_attempts?: number | null
           id?: string
+          last_login_at?: string | null
           name?: string
+          password_changed_at?: string | null
           phone?: string
+          require_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
           updated_at?: string
@@ -423,6 +441,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_account_status: {
+        Args: { user_id: string }
+        Returns: Json
+      }
       create_admin_user: {
         Args: { admin_email: string; admin_password: string }
         Returns: string
@@ -434,6 +456,14 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      handle_failed_login: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
+      handle_successful_login: {
+        Args: { user_id: string }
+        Returns: undefined
       }
       is_admin: {
         Args: Record<PropertyKey, never>
