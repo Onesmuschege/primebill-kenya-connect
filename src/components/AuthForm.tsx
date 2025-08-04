@@ -14,6 +14,7 @@ export const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [showNetworkDiagnostics, setShowNetworkDiagnostics] = useState(false);
   const { signIn, signUp } = useAuth();
 
   const [signInData, setSignInData] = useState({
