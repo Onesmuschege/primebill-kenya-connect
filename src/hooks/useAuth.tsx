@@ -154,11 +154,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
         clearTimeout(timeoutId);
 
         if (error) {
+          // Track failed login attempt
+          await supabase.rpc('handle_failed_login', { user_email: email });
+          
           if (
             error.message.includes('Invalid login credentials') ||
             error.message.includes('Email not confirmed') ||
@@ -174,6 +177,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
 
           throw error;
+        }
+
+        // Track successful login
+        if (data.user) {
+          await supabase.rpc('handle_successful_login', { user_id: data.user.id });
         }
 
         toast({ title: 'Success', description: 'Signed in successfully' });

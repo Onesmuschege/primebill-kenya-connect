@@ -8,14 +8,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HeroSection } from '@/components/ui/hero-section';
 import { useAuth } from '@/hooks/useAuth';
 import { SupabaseConnectivityTest } from '@/components/SupabaseConnectivityTest';
+import { PasswordStrengthIndicator } from './auth/PasswordStrengthIndicator';
+import { EnhancedErrorHandler } from './auth/EnhancedErrorHandler';
+import { useAuditLogger } from '@/hooks/useAuditLogger';
 import { Loader2, Shield, Lock, ArrowRight, Settings } from 'lucide-react';
 
 export const AuthForm = () => {
+  const { signIn, signUp } = useAuth();
+  const { logLogin } = useAuditLogger();
   const [isLoading, setIsLoading] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [showNetworkDiagnostics, setShowNetworkDiagnostics] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [authError, setAuthError] = useState<any>(null);
 
   const [signInData, setSignInData] = useState({
     email: '',
@@ -32,10 +37,14 @@ export const AuthForm = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setAuthError(null);
+    
     try {
       await signIn(signInData.email, signInData.password);
-    } catch (error) {
+      await logLogin('password');
+    } catch (error: any) {
       console.error('Sign in error:', error);
+      setAuthError(error);
     } finally {
       setIsLoading(false);
     }
@@ -44,10 +53,13 @@ export const AuthForm = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setAuthError(null);
+    
     try {
       await signUp(signUpData.email, signUpData.password, signUpData.name, signUpData.phone);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign up error:', error);
+      setAuthError(error);
     } finally {
       setIsLoading(false);
     }
@@ -233,6 +245,7 @@ export const AuthForm = () => {
                       required
                       className="border-ocean-blue-200 focus:ring-ocean-blue-400 focus:border-ocean-blue-400"
                     />
+                    <PasswordStrengthIndicator password={signUpData.password} />
                   </div>
                   <Button 
                     type="submit" 
@@ -285,6 +298,18 @@ export const AuthForm = () => {
           </Button>
         </div>
         
+        {/* Error display */}
+        {authError && (
+          <div className="mt-4">
+            <EnhancedErrorHandler 
+              error={authError}
+              onRetry={() => setAuthError(null)}
+              onContactSupport={() => window.open('mailto:support@primebillkenya.com', '_blank')}
+              showNetworkDiagnostics={showNetworkDiagnostics}
+            />
+          </div>
+        )}
+
         {/* Diagnostics panel */}
         {showDiagnostics && (
           <div className="mt-4">

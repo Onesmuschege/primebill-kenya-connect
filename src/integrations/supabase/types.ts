@@ -396,7 +396,7 @@ export type Database = {
           last_login_at: string | null
           name: string
           password_changed_at: string | null
-          phone: string
+          phone: string | null
           require_password_change: boolean | null
           role: Database["public"]["Enums"]["user_role"]
           status: string
@@ -412,7 +412,7 @@ export type Database = {
           last_login_at?: string | null
           name: string
           password_changed_at?: string | null
-          phone: string
+          phone?: string | null
           require_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
@@ -428,7 +428,7 @@ export type Database = {
           last_login_at?: string | null
           name?: string
           password_changed_at?: string | null
-          phone?: string
+          phone?: string | null
           require_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
