@@ -60,11 +60,66 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [clearInvalidSession]);
 
+  const fetchUserProfile = useCallback(async (authUser: User) => {
+    console.log('Fetching user profile for:', authUser.id);
+    try {
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('name, phone, role')
+        .eq('id', authUser.id)
+        .maybeSingle();
+
+      console.log('Profile fetch result:', { profile, error });
+
+      if (error) {
+        console.warn('[Auth] Failed to fetch user profile from DB:', error.message);
+        // Fallback to user metadata instead of throwing
+        setUser({
+          ...authUser,
+          name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+          phone: authUser.user_metadata?.phone || '',
+          role: 'client',
+        });
+        return;
+      }
+
+      if (!profile) {
+        console.warn('[Auth] User profile not found, falling back to user_metadata');
+        setUser({
+          ...authUser,
+          name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+          phone: authUser.user_metadata?.phone || '',
+          role: 'client',
+        });
+        return;
+      }
+
+      console.log('Setting user with profile data:', profile);
+      setUser({
+        ...authUser,
+        name: profile.name,
+        phone: profile.phone,
+        role: profile.role,
+      });
+    } catch (err: any) {
+      console.error('[Auth] Unexpected error while fetching user profile:', err.message || err);
+      // Still set user with fallback data instead of null
+      setUser({
+        ...authUser,
+        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+        phone: authUser.user_metadata?.phone || '',
+        role: 'client',
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const initializeAuth = async () => {
+      console.log('Starting auth initialization...');
       try {
         setLoading(true);
         const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('Got session:', session ? 'exists' : 'none', error ? `error: ${error.message}` : 'no error');
 
         if (error) {
           console.error('Session retrieval error:', error);
@@ -74,9 +129,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (session?.user) {
+          console.log('Setting session and fetching user profile...');
           setSession(session);
           await fetchUserProfile(session.user);
         } else {
+          console.log('No session, setting user/session to null');
           setUser(null);
           setSession(null);
         }
@@ -86,6 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setSession(null);
       } finally {
+        console.log('Auth initialization complete, setting loading to false');
         setLoading(false);
       }
     };
@@ -112,56 +170,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [handleAuthError]);
-
-  const fetchUserProfile = async (authUser: User) => {
-    try {
-      const { data: profile, error } = await supabase
-        .from('users')
-        .select('name, phone, role')
-        .eq('id', authUser.id)
-        .maybeSingle();
-
-      if (error) {
-        console.warn('[Auth] Failed to fetch user profile from DB:', error.message);
-        // Fallback to user metadata instead of throwing
-        setUser({
-          ...authUser,
-          name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
-          phone: authUser.user_metadata?.phone || '',
-          role: 'client',
-        });
-        return;
-      }
-
-      if (!profile) {
-        console.warn('[Auth] User profile not found, falling back to user_metadata');
-        setUser({
-          ...authUser,
-          name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
-          phone: authUser.user_metadata?.phone || '',
-          role: 'client',
-        });
-        return;
-      }
-
-      setUser({
-        ...authUser,
-        name: profile.name,
-        phone: profile.phone,
-        role: profile.role,
-      });
-    } catch (err: any) {
-      console.error('[Auth] Unexpected error while fetching user profile:', err.message || err);
-      // Still set user with fallback data instead of null
-      setUser({
-        ...authUser,
-        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
-        phone: authUser.user_metadata?.phone || '',
-        role: 'client',
-      });
-    }
-  };
+  }, [handleAuthError, fetchUserProfile]);
 
   const signIn = async (email: string, password: string) => {
     const maxRetries = 3;
