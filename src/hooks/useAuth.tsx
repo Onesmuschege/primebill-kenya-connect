@@ -49,7 +49,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (
       error?.message?.includes('Failed to fetch') ||
       error?.message?.includes('refresh_token') ||
+      error?.message?.includes('Invalid Refresh Token') ||
+      error?.message?.includes('JWT') ||
       error?.status === 0 ||
+      error?.status === 400 ||
       error?.__isAuthError
     ) {
       console.log('Detected auth token issue, clearing session...');
@@ -115,11 +118,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .from('users')
         .select('name, phone, role')
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.warn('[Auth] Failed to fetch user profile from DB:', error.message);
-        throw new Error('Could not retrieve user profile from database');
+        // Fallback to user metadata instead of throwing
+        setUser({
+          ...authUser,
+          name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+          phone: authUser.user_metadata?.phone || '',
+          role: 'client',
+        });
+        return;
       }
 
       if (!profile) {
@@ -141,7 +151,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (err: any) {
       console.error('[Auth] Unexpected error while fetching user profile:', err.message || err);
-      setUser(null);
+      // Still set user with fallback data instead of null
+      setUser({
+        ...authUser,
+        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+        phone: authUser.user_metadata?.phone || '',
+        role: 'client',
+      });
     }
   };
 

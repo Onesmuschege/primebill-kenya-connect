@@ -14,7 +14,7 @@ import { SkipToContent } from '@/components/ui/skip-to-content';
 import { AccessibilityProvider } from '@/components/accessibility/AccessibilityProvider';
 import { AnalyticsProvider } from '@/components/analytics/BasicAnalytics';
 import { FullPageLoader } from '@/components/ui/loading-states';
-import { createCSPHeader } from '@/lib/security';
+
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -89,24 +89,14 @@ function App() {
     };
   }, []);
 
-  // Set up security headers
-  useEffect(() => {
-    const cspHeader = createCSPHeader();
-    const metaCSP = document.createElement('meta');
-    metaCSP.httpEquiv = 'Content-Security-Policy';
-    metaCSP.content = cspHeader;
-    document.head.appendChild(metaCSP);
-    return () => {
-      document.head.removeChild(metaCSP);
-    };
-  }, []);
+  // CSP is handled in index.html, no need for duplicate setup
 
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AccessibilityProvider>
-            <AnalyticsProvider trackingId={import.meta.env.VITE_GA_TRACKING_ID}>
+            <AnalyticsProvider trackingId="">{/* Remove env variable usage */}
               <AuthProvider>
                 <div className="min-h-screen w-full">
                   <SkipToContent />
