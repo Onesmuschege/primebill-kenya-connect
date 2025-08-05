@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const handleAuthError = useCallback((error: unknown) => {
+  const handleAuthError = useCallback((error: any) => {
     console.error('Auth error:', error);
     if (
       error?.message?.includes('Failed to fetch') ||
