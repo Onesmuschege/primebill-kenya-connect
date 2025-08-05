@@ -73,12 +73,12 @@ export const rateLimit = (() => {
 export const createCSPHeader = (): string => {
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
     "img-src 'self' data: https:",
-    "connect-src 'self' https://api.supabase.co https://ejyzldnrcgglcnpbxmda.supabase.co",
-    "frame-ancestors 'none'",
+    "connect-src 'self' https://ejyzldnrcgglcnpbxmda.supabase.co wss://ejyzldnrcgglcnpbxmda.supabase.co https://api.lovable.dev wss://api.lovable.dev",
+    "frame-ancestors 'self' https://*.lovableproject.com https://lovable.dev",
     "base-uri 'self'",
     "form-action 'self'"
   ].join('; ');

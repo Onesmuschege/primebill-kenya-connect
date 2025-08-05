@@ -9,14 +9,15 @@
     <meta name="author" content="PrimeBill Kenya Ltd" />
     <meta name="keywords" content="Kenya internet service provider, cybersecurity ISP, fiber internet Kenya, secure internet, Nairobi ISP, business internet Kenya, 24/7 internet support" />
     
-    <!-- Fixed CSP to allow Supabase -->
+    <!-- Fixed CSP to allow Supabase and Lovable -->
     <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  connect-src 'self' https://ejyzldnrcgglcnpbxmda.supabase.co wss://ejyzldnrcgglcnpbxmda.supabase.co;
-  font-src 'self' data:;
-  style-src 'self' 'unsafe-inline';
-  script-src 'self';
-  frame-ancestors 'none';
+  connect-src 'self' https://ejyzldnrcgglcnpbxmda.supabase.co wss://ejyzldnrcgglcnpbxmda.supabase.co https://api.lovable.dev wss://api.lovable.dev;
+  font-src 'self' data: https://fonts.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval';
+  frame-ancestors 'self' https://*.lovableproject.com https://lovable.dev;
+  img-src 'self' data: https:;
 ">
 
     <!-- Theme Color -->
