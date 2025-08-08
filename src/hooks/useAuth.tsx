@@ -114,46 +114,74 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    let isComponentMounted = true;
+
     const initializeAuth = async () => {
-      console.log('Starting auth initialization...');
+      console.log('[AUTH] Starting initialization...');
+      
       try {
         setLoading(true);
-        const { data: { session }, error } = await supabase.auth.getSession();
-        console.log('Got session:', session ? 'exists' : 'none', error ? `error: ${error.message}` : 'no error');
+        
+        // Add timeout to prevent infinite hanging
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session fetch timeout')), 10000)
+        );
+        
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any;
+        
+        console.log('[AUTH] Session result:', {
+          hasSession: !!session,
+          hasUser: !!session?.user,
+          error: error?.message
+        });
+
+        if (!isComponentMounted) return;
 
         if (error) {
-          console.error('Session retrieval error:', error);
+          console.error('[AUTH] Session retrieval error:', error);
           handleAuthError(error);
           setLoading(false);
           return;
         }
 
         if (session?.user) {
-          console.log('Setting session and fetching user profile...');
+          console.log('[AUTH] Valid session found, fetching profile...');
           setSession(session);
           await fetchUserProfile(session.user);
         } else {
-          console.log('No session, setting user/session to null');
+          console.log('[AUTH] No session, setting null state');
           setUser(null);
           setSession(null);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        handleAuthError(error);
-        setUser(null);
-        setSession(null);
+        console.error('[AUTH] Initialization error:', error);
+        if (isComponentMounted) {
+          handleAuthError(error);
+          setUser(null);
+          setSession(null);
+        }
       } finally {
-        console.log('Auth initialization complete, setting loading to false');
-        setLoading(false);
+        if (isComponentMounted) {
+          console.log('[AUTH] Initialization complete');
+          setLoading(false);
+        }
       }
     };
 
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email);
+      console.log('[AUTH] State change:', { event, hasUser: !!session?.user });
+
+      if (!isComponentMounted) return;
 
       try {
+        setLoading(true);
+        
         if (session?.user) {
           setSession(session);
           await fetchUserProfile(session.user);
@@ -162,14 +190,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSession(null);
         }
       } catch (error) {
-        console.error('Auth state change error:', error);
-        handleAuthError(error);
+        console.error('[AUTH] State change error:', error);
+        if (isComponentMounted) {
+          handleAuthError(error);
+        }
+      } finally {
+        if (isComponentMounted) {
+          setLoading(false);
+        }
       }
-
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isComponentMounted = false;
+      subscription.unsubscribe();
+    };
   }, [handleAuthError, fetchUserProfile]);
 
   const signIn = async (email: string, password: string) => {

@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -16,6 +16,13 @@ import { AnalyticsProvider } from '@/components/analytics/BasicAnalytics';
 import { FullPageLoader } from '@/components/ui/loading-states';
 
 import './App.css';
+
+// Debug component for development
+const AuthDebugPanel = React.lazy(() => 
+  import('@/components/debug/AuthHealthMonitor').then(module => ({
+    default: module.AuthHealthMonitor
+  }))
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,9 +52,31 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const { user, loading } = useAuth();
+  const [showDebug, setShowDebug] = useState(false);
+
+  // Show debug panel in development after 5 seconds of loading
+  useEffect(() => {
+    if (import.meta.env.DEV && loading) {
+      const timer = setTimeout(() => setShowDebug(true), 5000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowDebug(false);
+    }
+  }, [loading]);
 
   if (loading) {
-    return <FullPageLoader message="Loading application..." />;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <FullPageLoader message="Loading application..." />
+        {showDebug && (
+          <div className="mt-8 w-full max-w-2xl px-4">
+            <React.Suspense fallback={<div>Loading debug panel...</div>}>
+              <AuthDebugPanel />
+            </React.Suspense>
+          </div>
+        )}
+      </div>
+    );
   }
 
   if (!user) {
